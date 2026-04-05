@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.2.0] - 2026-04-05
+
+### Added
+- **Unit Testing:** Integrated `pytest` suite with `unittest.mock` to simulate network responses for reliable CI testing.
+
 ## [0.1.0] - 2026-04-05
 
 ### Added
