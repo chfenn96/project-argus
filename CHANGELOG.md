@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.3.0] - 2026-04-05
+
+### Added
+- **Containerization:** Added `Dockerfile` using a multi-step approach and `python:3.10-slim` for a minimal attack surface.
+- **Security:** Configured Docker to run as a non-root user (`dummy`) to follow the Principle of Least Privilege.
+
 ## [0.2.0] - 2026-04-05
 
 ### Added
