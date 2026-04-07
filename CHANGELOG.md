@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.6.0] - 2026-04-07
+
+### Added
+- **Data Persistence:** Fully integrated `boto3` to write uptime metrics to DynamoDB.
+- **Serverless Compute:** Deployed AWS Lambda function running a containerized Python runtime.
+- **Validation:** Verified successful end-to-end data flow from Lambda invocation to DynamoDB storage.
+
 ## [0.5.2] - 2026-04-07
 
 ### Fixed

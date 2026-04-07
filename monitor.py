@@ -1,3 +1,4 @@
+import boto3
 import requests
 import time
 from datetime import datetime
@@ -51,12 +52,19 @@ def lambda_handler(event, context):
     'event' contains the trigger data (we'll use this later).
     'context' contains info about the runtime.
     """
-    print(f"Starting uptime checks at {datetime.utcnow().isoformat()}...")
+    print("Lambda handler started...")
+    
+    # Initialize the database connection
+    db = boto3.resource('dynamodb')
+    table = db.Table('ArgusMetrics')
     
     results = []
     for url in URLS_TO_MONITOR:
         metrics = check_uptime(url)
-        print(metrics)
+
+        # New Step: Save to database
+        print(f"Saving results for {url} to DynamoDB...")
+        table.put_item(Item=metrics)
         results.append(metrics)
     
     # Returning this tells Lambda "I'm done and I succeeded"
@@ -65,12 +73,7 @@ def lambda_handler(event, context):
         'body': results
     }
 
-def main():
-    print(f"Starting uptime checks at {datetime.utcnow().isoformat()}...")
-    
-    for url in URLS_TO_MONITOR:
-        metrics = check_uptime(url)
-        print(metrics)
-
-if __name__ == "__main__":
-    main()
+# CRITICAL: Do NOT call main() or lambda_handler() down here! 
+# To test locally, use:
+# if __name__ == "__main__":
+#     lambda_handler(None, None)
