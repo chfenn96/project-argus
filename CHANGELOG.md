@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.5.0] - 2026-04-07
+
+### Added
+- **Data Persistence:** Provisioned a serverless Amazon DynamoDB table for time-series metric storage.
+- **IAM Security:** Defined granular execution policies for the application role, ensuring secure data ingestion.
+- **Infrastructure:** Integrated database and permission logic into the Terraform state.
+
 ## [0.4.1] - 2026-04-06
 
 ### Added
