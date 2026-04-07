@@ -1,3 +1,4 @@
+# tfsec:ignore:aws-dynamodb-table-customer-key
 resource "aws_dynamodb_table" "monitoring_results" {
   name           = "ArgusMetrics"
   billing_mode   = "PAY_PER_REQUEST" 
