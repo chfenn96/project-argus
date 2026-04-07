@@ -10,6 +10,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.1.1] - 2026-04-07
+
+### Fixed
+- **IAM Security:** Eliminated wildcard resource access for CI/CD role; implemented specific ARN scoping for ECR and Lambda.
+- **Data Protection:** Enabled DynamoDB Point-in-Time Recovery (PITR) for disaster recovery.
+- **Network Hardening:** Disabled automatic public IP assignment on subnets to reduce the default attack surface.
+- **Observability:** Enabled AWS X-Ray active tracing for serverless execution monitoring.
+
+### Changed
+- **Cost Optimization:** Explicitly documented the use of AWS Managed Keys over Customer Managed Keys (KMS) to maintain $0.00 operational cost.
+
+## [1.0.0] - 2026-04-07
+
+### Added
+- **Deployment Strategy:** Migrated from `latest` tags to unique `github.sha` versioning for all container deployments to support ECR immutability.
+- **Documentation:** Added descriptive metadata to all Security Group rules to provide context for firewall auditing.
+
+### Security
+- **Data Protection:** Enabled AES-256 Server-Side Encryption (SSE) at rest for the `ArgusMetrics` DynamoDB table.
+- **Artifact Hardening:** Enforced ECR image immutability, ensuring deployed containers cannot be tampered with or overwritten.
+- **Vulnerability Management:** Integrated `tfsec` as a mandatory CI gate to perform static analysis of Infrastructure as Code (IaC).
+- **Compliance:** Addressed and documented network egress risks, aligning the VPC with the principle of least privilege where applicable.
+
 ## [0.9.0] - 2026-04-07
 
 ### Added

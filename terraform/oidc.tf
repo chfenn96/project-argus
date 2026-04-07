@@ -38,15 +38,26 @@ resource "aws_iam_role_policy" "github_actions_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken",
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        # Narrow the scope to ONLY our resources
+        Effect = "Allow"
+        Action = [
           "ecr:BatchCheckLayerAvailability",
           "ecr:PutImage",
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload",
-          "lambda:UpdateFunctionCode"
+          "ecr:CompleteLayerUpload"
         ]
-        Resource = "*" # Scoped to ECR and Lambda actions only
+        Resource = aws_ecr_repository.app_repo.arn
+      },
+      {
+        Effect = "Allow"
+        Action = ["lambda:UpdateFunctionCode"]
+        Resource = aws_lambda_function.monitor_lambda.arn
       }
     ]
   })

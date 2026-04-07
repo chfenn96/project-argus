@@ -1,3 +1,4 @@
+# tfsec:ignore:aws-dynamodb-table-customer-key
 resource "aws_dynamodb_table" "monitoring_results" {
   name           = "ArgusMetrics"
   billing_mode   = "PAY_PER_REQUEST" 
@@ -12,6 +13,16 @@ resource "aws_dynamodb_table" "monitoring_results" {
   attribute {
     name = "timestamp"
     type = "S"
+  }
+
+  # Enable recovery (Free for small tables)
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  server_side_encryption {
+    enabled = true
+    # tfsec:ignore:aws-dynamodb-table-customer-key
   }
 
   tags = {
