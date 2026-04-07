@@ -7,6 +7,7 @@ from datetime import datetime
 URLS_TO_MONITOR =[
     "https://www.google.com",
     "https://www.github.com",
+    "https://www.wikipedia.org",
     "https://this-website-is-fake-and-will-fail.com" # Included to test failure handling!
 ]
 

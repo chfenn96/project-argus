@@ -33,8 +33,8 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 
 ## 📅 Development Roadmap
 - [x] Phase 1: Core Python Engine & Docker Containerization
-- [ ] Phase 2: Custom AWS VPC Networking & IAM Security
-- [ ] Phase 3: Terraform & Serverless Infrastructure Deployment
+- [x] Phase 2: Custom AWS VPC Networking & IAM Security
+- [x] Phase 3: Terraform & Serverless Infrastructure Deployment
 - [ ] Phase 4: GitHub Actions CI/CD Pipeline
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible
 - [ ] Phase 6: Grafana Observability Integration
