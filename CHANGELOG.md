@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.7.0] - 2026-04-07
+
+### Added
+- **Automation:** Implemented serverless scheduling via Amazon EventBridge, enabling 24/7 autonomous uptime monitoring.
+- **Security:** Added fine-grained Lambda resource-based policies to authorize external service invocation.
+- **Resilience:** Established periodic data collection to build historical uptime trends.
+
 ## [0.6.0] - 2026-04-07
 
 ### Added
