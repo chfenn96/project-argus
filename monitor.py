@@ -45,6 +45,26 @@ def check_uptime(url):
         
     return result
 
+def lambda_handler(event, context):
+    """
+    AWS Lambda calls this function when it starts.
+    'event' contains the trigger data (we'll use this later).
+    'context' contains info about the runtime.
+    """
+    print(f"Starting uptime checks at {datetime.utcnow().isoformat()}...")
+    
+    results = []
+    for url in URLS_TO_MONITOR:
+        metrics = check_uptime(url)
+        print(metrics)
+        results.append(metrics)
+    
+    # Returning this tells Lambda "I'm done and I succeeded"
+    return {
+        'statusCode': 200,
+        'body': results
+    }
+
 def main():
     print(f"Starting uptime checks at {datetime.utcnow().isoformat()}...")
     

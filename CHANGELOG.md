@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.5.2] - 2026-04-07
+
+### Fixed
+- **Runtime Error:** Resolved 'Runtime.ExitError' by wrapping monitoring logic in an AWS-compliant handler function.
+- **Container Interface:** Corrected Dockerfile CMD syntax and pathing to align with the AWS Lambda Runtime Interface Client (RIC).
+
 ## [0.5.1] - 2026-04-07
 
 ### Added
