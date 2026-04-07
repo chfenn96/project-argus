@@ -10,7 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
-## [1.1.1] - 2026-04-07
+## [1.1.0] - 2026-04-07
+
+### Added
+- **Observability:** Provisioned a native AWS CloudWatch Dashboard using Terraform.
+- **Metrics Tracking:** Implemented real-time visualization for Lambda execution duration (latency) and invocation counts.
+- **SRE Standards:** Established foundational Service Level Indicators (SLIs) to monitor system health and performance trends.
+
+## [1.0.1] - 2026-04-07
 
 ### Fixed
 - **IAM Security:** Eliminated wildcard resource access for CI/CD role; implemented specific ARN scoping for ECR and Lambda.
