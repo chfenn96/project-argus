@@ -6,12 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- [ ] Phase 2: Custom AWS VPC Networking & IAM Security.
 - [ ] Phase 3: Terraform & Serverless Infrastructure Deployment.
 - [ ] Phase 4: GitHub Actions CI/CD Pipeline.
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [0.4.0] - 2026-04-06
+
+### Added
+- **Infrastructure as Code:** Bootstrapped Terraform environment with provider pinning for AWS.
+- **Identity Management:** Implemented AWS IAM Identity Center (SSO) for human-to-cloud authentication.
+- **Security:** Established a zero-trust credential model using short-lived tokens instead of static IAM Access Keys.
+- **Project Structure:** Created dedicated `/terraform` directory for infrastructure management.
+
+### Changed
+- Migrated from local execution context to AWS-authenticated context.
 
 ## [0.3.0] - 2026-04-05
 
