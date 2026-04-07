@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.9.0] - 2026-04-07
+
+### Added
+- **Full CI/CD Pipeline:** Implemented an automated lifecycle using GitHub Actions to gate deployments behind quality checks.
+- **Code Quality Gates:** Integrated `Black` (formatting) and `Flake8` (linting) to ensure codebase consistency.
+- **Automated Testing:** Established a `pytest` suite within the CI environment to validate application logic before deployment.
+- **Infrastructure Security:** Integrated `tfsec` to perform static analysis on Terraform code, identifying potential cloud misconfigurations.
+- **CD Automation:** Fully automated the Docker build-tag-push flow and Lambda function code refreshes.
+
+### Security
+- **Identity Federation:** Migrated to OIDC (OpenID Connect) for AWS authentication, removing the need for long-lived secrets in GitHub.
+- **IAM Hardening:** Applied granular IAM policies to the deployment role, restricting access to specific ECR and Lambda resources.
+
 ## [0.8.0] - 2026-04-07
 
 ### Added
