@@ -6,11 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- [ ] Phase 3: Terraform & Serverless Infrastructure Deployment.
 - [ ] Phase 4: GitHub Actions CI/CD Pipeline.
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [0.6.0] - 2026-04-07
+
+### Added
+- **Data Persistence:** Fully integrated `boto3` to write uptime metrics to DynamoDB.
+- **Serverless Compute:** Deployed AWS Lambda function running a containerized Python runtime.
+- **Validation:** Verified successful end-to-end data flow from Lambda invocation to DynamoDB storage.
+
+## [0.5.2] - 2026-04-07
+
+### Fixed
+- **Runtime Error:** Resolved 'Runtime.ExitError' by wrapping monitoring logic in an AWS-compliant handler function.
+- **Container Interface:** Corrected Dockerfile CMD syntax and pathing to align with the AWS Lambda Runtime Interface Client (RIC).
+
+## [0.5.1] - 2026-04-07
+
+### Added
+- **Registry:** Provisioned Amazon Elastic Container Registry (ECR) for private image management.
+- **Security:** Enabled automated vulnerability scanning for all container images.
+- **FinOps:** Implemented ECR lifecycle policies to optimize storage costs by purging stale images.
+- **Deployment:** Successfully authenticated and pushed the first immutable Docker artifact to the cloud.
+- **Observability:** Added Terraform outputs for key resource identifiers (ECR URL, DynamoDB ARN).
+
+## [0.5.0] - 2026-04-07
+
+### Added
+- **Data Persistence:** Provisioned a serverless Amazon DynamoDB table for time-series metric storage.
+- **IAM Security:** Defined granular execution policies for the application role, ensuring secure data ingestion.
+- **Infrastructure:** Integrated database and permission logic into the Terraform state.
 
 ## [0.4.1] - 2026-04-06
 

@@ -1,21 +1,14 @@
-# Step 1: Use an official, lightweight Python base image
-FROM python:3.10.14-slim-bookworm
+# Step 1: Use the official AWS Lambda image for Python
+FROM public.ecr.aws/lambda/python:3.10
 
-# Step 2: Set the working directory inside the container
-WORKDIR /app
+# Step 2: Copy only the requirements first (optimizes Docker caching)
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
 
-# Step 3: Copy only the requirements first (this optimizes Docker caching)
-COPY requirements.txt .
+# Step 3: Install dependencies
+RUN pip install -r requirements.txt
 
-# Step 4: Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Step 4: Copy code into the task root
+COPY monitor.py ${LAMBDA_TASK_ROOT}
 
-# Step 5: Copy the rest of application code
-COPY monitor.py .
-
-# Step 6: Do not run the container as root!
-RUN useradd -m dummy
-USER dummy
-
-# Step 7: The command that runs when the container starts
-CMD ["python", "monitor.py"]
+# Step 5: The command that AWS Lambda calls
+CMD [ "monitor.lambda_handler" ]
