@@ -6,11 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- [ ] Phase 3: Terraform & Serverless Infrastructure Deployment.
 - [ ] Phase 4: GitHub Actions CI/CD Pipeline.
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [0.5.1] - 2026-04-07
+
+### Added
+- **Registry:** Provisioned Amazon Elastic Container Registry (ECR) for private image management.
+- **Security:** Enabled automated vulnerability scanning for all container images.
+- **FinOps:** Implemented ECR lifecycle policies to optimize storage costs by purging stale images.
+- **Deployment:** Successfully authenticated and pushed the first immutable Docker artifact to the cloud.
+- **Observability:** Added Terraform outputs for key resource identifiers (ECR URL, DynamoDB ARN).
 
 ## [0.5.0] - 2026-04-07
 
