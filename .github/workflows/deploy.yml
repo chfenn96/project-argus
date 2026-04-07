@@ -60,7 +60,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: argus-monitor
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ github.sha }} # USE THE UNIQUE COMMIT ID
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -69,4 +69,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name argus-monitor-function \
-            --image-uri ${{ steps.login-ecr.outputs.registry }}/argus-monitor:latest
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/argus-monitor:${{ github.sha }}

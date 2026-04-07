@@ -14,6 +14,10 @@ resource "aws_dynamodb_table" "monitoring_results" {
     type = "S"
   }
 
+  server_side_encryption {
+    enabled = true
+  }
+
   tags = {
     Name        = "argus-metrics-table"
     Environment = "dev"

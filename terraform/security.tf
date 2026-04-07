@@ -24,6 +24,8 @@ resource "aws_security_group" "app_sg" {
 
   # Egress: Allow all outbound traffic so we can ping websites
   egress {
+    # tfsec:ignore:aws-ec2-no-public-egress-sgr
+    description = "Allow outbound pings to the internet for uptime monitoring"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
