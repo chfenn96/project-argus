@@ -1,0 +1,9 @@
+[flake8]
+# Match Black's default line length
+max-line-length = 88
+
+# Ignore specific errors that conflict with Black's formatting style
+extend-ignore = E203, E501
+
+# Only check your actual code
+exclude = .git,__pycache__,docs,old,build,dist,.venv
