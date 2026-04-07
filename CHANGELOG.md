@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [0.4.1] - 2026-04-06
+
+### Added
+- **Identity (IAM):** Provisioned AWS IAM execution roles with defined trust policies for serverless compute.
+- **Firewall (Security Groups):** Implemented stateful network firewalls to govern traffic flow at the resource level.
+- **Security:** Enforced a "Deny-All" inbound traffic policy, strictly allowing only necessary outbound (egress) traffic for uptime monitoring.
+
 ## [0.4.0] - 2026-04-06
 
 ### Added
