@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.1.1] - 2026-04-07
+
+### Fixed
+- **IAM Security:** Eliminated wildcard resource access for CI/CD role; implemented specific ARN scoping for ECR and Lambda.
+- **Data Protection:** Enabled DynamoDB Point-in-Time Recovery (PITR) for disaster recovery.
+- **Network Hardening:** Disabled automatic public IP assignment on subnets to reduce the default attack surface.
+- **Observability:** Enabled AWS X-Ray active tracing for serverless execution monitoring.
+
+### Changed
+- **Cost Optimization:** Explicitly documented the use of AWS Managed Keys over Customer Managed Keys (KMS) to maintain $0.00 operational cost.
+
 ## [1.0.0] - 2026-04-07
 
 ### Added

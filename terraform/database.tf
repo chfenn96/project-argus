@@ -14,8 +14,14 @@ resource "aws_dynamodb_table" "monitoring_results" {
     type = "S"
   }
 
+  # Enable recovery (Free for small tables)
+  point_in_time_recovery {
+    enabled = true
+  }
+
   server_side_encryption {
     enabled = true
+    # tfsec:ignore:aws-dynamodb-table-customer-key
   }
 
   tags = {
