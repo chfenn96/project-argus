@@ -6,10 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- [ ] Phase 4: GitHub Actions CI/CD Pipeline.
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [0.8.0] - 2026-04-07
+
+### Added
+- **CI/CD Pipeline:** Integrated GitHub Actions to automate the build-test-deploy lifecycle.
+- **Identity Federation:** Implemented OpenID Connect (OIDC) to eliminate the need for long-lived AWS Access Keys in GitHub.
+- **Automated Deployment:** Configured automated Docker image tagging and Lambda code refreshes upon successful pushes to the main branch.
+
+### Fixed
+- **State Management:** Utilized `terraform import` to resolve `EntityAlreadyExists` errors during OIDC provider provisioning, ensuring a clean IaC state.
 
 ## [0.7.0] - 2026-04-07
 
