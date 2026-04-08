@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.3.1] - 2026-04-07
+
+### Fixed
+- **CI Regression:** Restored Black and Flake8 quality gates to the deployment pipeline to maintain code standards during refactoring.
+
 ## [1.3.0] - 2026-04-07
 
 ### Added
