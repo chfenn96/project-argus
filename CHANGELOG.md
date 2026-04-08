@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.2.1] - 2026-04-07
+
+### Fixed
+- **IAM Architecture:** Migrated from direct user-attached policies to IAM Groups, aligning with enterprise management standards.
+- **Security Scoping:** Hardened Log Group permissions by replacing wildcards with specific ARN identifiers for the monitoring Lambda.
+- **Audit Findings:** Addressed `tfsec` HIGH and LOW alerts regarding IAM best practices and policy wildcards.
+
 ## [1.2.0] - 2026-04-07
 
 ### Added
