@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.3.3] - 2026-04-08
+
+### Security
+- **State Hardening:** Implemented a multi-layer security model for the Remote Terraform Backend.
+- **Access Control:** Added a global public access block to the S3 state bucket to prevent accidental data exposure.
+- **Data Encryption:** Enforced encryption-at-rest for both S3 and DynamoDB components of the state management system.
+- **Audit Compliance:** Resolved 11 security findings identified by tfsec regarding backend infrastructure.
+
 ## [1.3.2] - 2026-04-08
 
 ### Fixed
