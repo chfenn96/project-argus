@@ -35,7 +35,7 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 - [x] Phase 1: Core Python Engine & Docker Containerization
 - [x] Phase 2: Custom AWS VPC Networking & IAM Security
 - [x] Phase 3: Terraform & Serverless Infrastructure Deployment
-- [ ] Phase 4: GitHub Actions CI/CD Pipeline
+- [x] Phase 4: GitHub Actions CI/CD Pipeline
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible
-- [ ] Phase 6: Grafana Observability Integration
+- [x] Phase 6: Grafana Observability Integration
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation

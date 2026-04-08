@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
-- [ ] Phase 6: Grafana Observability Integration.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [1.2.0] - 2026-04-07
+
+### Added
+- **External Observability:** Successfully integrated Grafana Cloud for advanced metrics visualization.
+- **Identity (IAM):** Provisioned a dedicated 'grafana-cloud-reader' IAM user to enforce least-privilege data access.
+- **Reporting:** Created a public dashboard to track Lambda latency and invocation trends over time.
 
 ## [1.1.0] - 2026-04-07
 
