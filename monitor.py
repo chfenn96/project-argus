@@ -1,20 +1,18 @@
+import asyncio
+import httpx
 import boto3
-import requests
 import time
+import os
 from datetime import datetime
 
-# A list of websites to monitor
-URLS_TO_MONITOR = [
-    "https://www.google.com",
-    "https://www.github.com",
-    "https://www.wikipedia.org",
-    "https://this-website-is-fake-and-will-fail.com",  # Included to test failure handling!
-]
+# FIX: Get URLs from Environment Variables (No more hardcoding!)
+URLS_ENV = os.getenv("URLS_TO_MONITOR", "https://www.google.com")
+URLS_TO_MONITOR = [url.strip() for url in URLS_ENV.split(",")]
 
 
-def check_uptime(url):
+async def check_uptime(client, url, retries=3):
     """
-    Pings a URL and returns a dictionary with the status, response time, and timestamp.
+    Pings a URL asynchronously with retry logic.
     """
     result = {
         "url": url,
@@ -24,57 +22,50 @@ def check_uptime(url):
         "status_code": None,
     }
 
-    try:
-        # Start the timer
-        start_time = time.time()
+    for attempt in range(retries):
+        try:
+            start_time = time.time()
+            # Asynchronous GET request
+            response = await client.get(url, timeout=5.0)
+            end_time = time.time()
 
-        # Make the request with a 5-second timeout
-        response = requests.get(url, timeout=5)
+            result["response_time_ms"] = round((end_time - start_time) * 1000)
+            result["status_code"] = response.status_code
 
-        # Calculate how long it took in milliseconds
-        end_time = time.time()
-        result["response_time_ms"] = round((end_time - start_time) * 1000)
+            if response.status_code >= 200 and response.status_code < 300:
+                result["status"] = "UP"
+                return result  # Success!
 
-        # Record the status code (e.g., 200 for OK, 404 for Not Found)
-        result["status_code"] = response.status_code
-
-        # If the status code is 200-299, we consider it UP
-        if response.ok:
-            result["status"] = "UP"
-
-    except requests.exceptions.RequestException as e:
-        # If there's a timeout, DNS failure, etc., it will fall here and remain "DOWN"
-        print(f"Error checking {url}: {e}")
+        except Exception as e:
+            if attempt == retries - 1:
+                print(f"Final failure for {url}: {e}")
+            else:
+                # Exponential backoff (wait longer each time)
+                await asyncio.sleep(2**attempt)
 
     return result
 
 
-def lambda_handler(event, context):
-    """
-    AWS Lambda calls this function when it starts.
-    'event' contains the trigger data (we'll use this later).
-    'context' contains info about the runtime.
-    """
-    print("Lambda handler started...")
-
-    # Initialize the database connection
-    db = boto3.resource("dynamodb")
+async def run_monitor():
+    db = boto3.resource("dynamodb", region_name="us-east-1")
     table = db.Table("ArgusMetrics")
 
-    results = []
-    for url in URLS_TO_MONITOR:
-        metrics = check_uptime(url)
+    # Use a single client session for all pings
+    async with httpx.AsyncClient() as client:
+        # Create a list of tasks (one for each URL)
+        tasks = [check_uptime(client, url) for url in URLS_TO_MONITOR]
 
-        # New Step: Save to database
-        print(f"Saving results for {url} to DynamoDB...")
-        table.put_item(Item=metrics)
-        results.append(metrics)
+        # MAGIC: Run all pings simultaneously
+        results = await asyncio.gather(*tasks)
 
-    # Returning this tells Lambda "I'm done and I succeeded"
-    return {"statusCode": 200, "body": results}
+        # Save results to DynamoDB
+        for metrics in results:
+            print(f"Saving {metrics['url']} - {metrics['status']}")
+            table.put_item(Item=metrics)
+
+    return results
 
 
-# CRITICAL: Do NOT call main() or lambda_handler() down here!
-# To test locally, use:
-# if __name__ == "__main__":
-#     lambda_handler(None, None)
+def lambda_handler(event, context):
+    # Entry point for AWS Lambda
+    return {"statusCode": 200, "body": asyncio.run(run_monitor())}

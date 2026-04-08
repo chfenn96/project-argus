@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.3.1] - 2026-04-07
+
+### Fixed
+- **CI Regression:** Restored Black and Flake8 quality gates to the deployment pipeline to maintain code standards during refactoring.
+
+## [1.3.0] - 2026-04-07
+
+### Added
+- **Performance:** Migrated from sequential to asynchronous execution, significantly reducing execution time for multiple monitoring targets.
+- **Reliability:** Implemented automated retry logic with exponential backoff for enhanced resilience.
+- **Remote State:** Established S3-backed Terraform state with DynamoDB state locking to ensure team collaboration safety.
+
+### Changed
+- **Architecture:** Externalized target URL configuration using environment variables, moving away from hardcoded script values.
+- **Dependencies:** Replaced `requests` with `httpx` to support asynchronous HTTP operations.
+
 ## [1.2.2] - 2026-04-07
 
 ### Fixed

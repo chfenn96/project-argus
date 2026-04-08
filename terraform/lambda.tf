@@ -17,4 +17,11 @@ resource "aws_lambda_function" "monitor_lambda" {
   memory_size = 128 # The smallest (and cheapest) amount
   timeout     = 30
 
+  environment {
+    variables = {
+      # Add as many URLs as you want here, separated by commas!
+      URLS_TO_MONITOR = "https://www.google.com,https://www.github.com,https://www.wikipedia.org"
+    }
+  }
+
 }
