@@ -66,6 +66,22 @@ async def run_monitor():
     return results
 
 
-def lambda_handler(event, context):
-    # Entry point for AWS Lambda
-    return {"statusCode": 200, "body": asyncio.run(run_monitor())}
+async def lambda_handler(event, context):
+    """
+    AWS Lambda natively supports 'async def'.
+    Removing asyncio.run() prevents loop conflicts during testing and
+    follows AWS best practices for async runtimes.
+    """
+    print("Lambda handler started...")
+
+    # Just 'await' the coroutine directly
+    results = await run_monitor()
+
+    return {"statusCode": 200, "body": results}
+
+
+# Only for local testing
+if __name__ == "__main__":
+    # Keep asyncio.run here because when running from the terminal,
+    # there is no event loop started yet.
+    asyncio.run(run_monitor())
