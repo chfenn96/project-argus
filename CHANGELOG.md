@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.3.2] - 2026-04-08
+
+### Fixed
+- **Testing Logic:** Resolved `RuntimeError: asyncio.run() cannot be called from a running event loop` by migrating the Lambda handler to native async.
+- **Dependency Bloat:** Separated development dependencies into `requirements-dev.txt` to optimize production Docker image size and security.
+
+### Changed
+- **Async Verification:** Upgraded the test suite to use `respx` for high-performance async HTTP mocking and `pytest-asyncio` for event-loop management.
+- **Handler Interface:** Updated the monitoring engine to utilize the native AWS Lambda asynchronous runtime interface.
+
 ## [1.3.1] - 2026-04-07
 
 ### Fixed
