@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.2.2] - 2026-04-07
+
+### Fixed
+- **Compliance:** Documented and suppressed the MFA enforcement check for the `observability-readers` group.
+- **Rationale:** Recognized the user as a programmatic service account where traditional MFA is not applicable for automated dashboard querying.
+
 ## [1.2.1] - 2026-04-07
 
 ### Fixed
