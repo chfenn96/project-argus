@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
 
+## [1.5.0] - 2026-04-08
+
+### Added
+- **Configuration Management:** Integrated Ansible for "Configuration-as-Code" on the management tier.
+- **Automation:** Replaced manual server setup with repeatable, idempotent YAML playbooks.
+- **Security:** Implemented automated system patching and custom access banners on the EC2 control plane.
+- **Tooling:** Automated the deployment of Docker and essential DevOps utilities (htop, unzip, git).
+
 ## [1.4.0] - 2026-04-08
 
 ### Added
