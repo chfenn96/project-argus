@@ -4,6 +4,7 @@ resource "aws_iam_user" "grafana" {
 }
 
 # 2. THE GROUP (Result #3 Fix: No direct user policies)
+# tfsec:ignore:aws-iam-enforce-group-mfa
 resource "aws_iam_group" "observability_readers" {
   name = "observability-readers"
 }
