@@ -18,7 +18,7 @@ resource "aws_iam_role" "app_role" {
 
 # 2. Security Group (The "Virtual Firewall")
 resource "aws_security_group" "app_sg" {
-  name        = "argus-app-sg"
+  name        = "${var.project_name}-app-sg"
   description = "Allow outbound traffic for monitoring"
   vpc_id      = aws_vpc.main.id
 
@@ -33,7 +33,15 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "argus-app-sg"
+  ingress {
+    description = "Allow SSH from everywhere for troubleshooting"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip] 
   }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-app-sg"
+  })
 }

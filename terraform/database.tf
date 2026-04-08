@@ -25,10 +25,9 @@ resource "aws_dynamodb_table" "monitoring_results" {
     # tfsec:ignore:aws-dynamodb-table-customer-key
   }
 
-  tags = {
-    Name        = "argus-metrics-table"
-    Environment = "dev"
-  }
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-metrics-table"
+  })
 }
 
 # Add a policy to App Role so it can actually WRITE to this table
