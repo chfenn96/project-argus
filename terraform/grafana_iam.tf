@@ -1,17 +1,29 @@
-# 1. THE USER: This is the actual "identity" in AWS
+# 1. THE USER
 resource "aws_iam_user" "grafana" {
   name = "grafana-cloud-reader"
 }
 
-# 2. THE KEYS: This generates the Access Key and Secret Key for Grafana
+# 2. THE GROUP (Result #3 Fix: No direct user policies)
+resource "aws_iam_group" "observability_readers" {
+  name = "observability-readers"
+}
+
+# 3. THE MEMBERSHIP: Put the user in the group
+resource "aws_iam_group_membership" "grafana_team" {
+  name = "grafana-group-membership"
+  users = [aws_iam_user.grafana.name]
+  group = aws_iam_group.observability_readers.name
+}
+
+# 4. THE KEYS (Still linked to the user)
 resource "aws_iam_access_key" "grafana" {
   user = aws_iam_user.grafana.name
 }
 
-# 3. THE POLICY: This gives the user permission to read Metrics and Logs
-resource "aws_iam_user_policy" "grafana_read" {
-  name = "GrafanaCloudWatchRead"
-  user = aws_iam_user.grafana.name
+# 5. THE GROUP POLICY (Results #1-2 Fix: Scoped Resources)
+resource "aws_iam_group_policy" "grafana_read" {
+  name  = "GrafanaCloudWatchRead"
+  group = aws_iam_group.observability_readers.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -25,41 +37,33 @@ resource "aws_iam_user_policy" "grafana_read" {
           "cloudwatch:ListMetrics"
         ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = "*" # tfsec:ignore:aws-iam-no-policy-wildcards (Required for discovery)
       },
       {
-        # LOGS PERMISSIONS
+        # LOGS PERMISSIONS (Results #1-2 Fix)
+        # We scope these to our specific Lambda Log Group
         Action = [
-          "logs:DescribeLogGroups",
           "logs:GetLogEvents",
-          "logs:GetLogRecord",
           "logs:FilterLogEvents",
           "logs:StartQuery",
-          "logs:StopQuery",
           "logs:GetQueryResults"
         ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = "arn:aws:logs:us-east-1:${local.account_id}:log-group:/aws/lambda/argus-monitor-function:*"
       },
       {
-        # TAGGING PERMISSIONS
-        Action = [
-          "tag:GetResources"
-        ]
-        Effect   = "Allow"
+        # Result #1-2 Fix: DescribeLogGroups requires wildcard to list all groups
+        Action = ["logs:DescribeLogGroups"]
+        Effect = "Allow"
+        # tfsec:ignore:aws-iam-no-policy-wildcards
+        Resource = "*" 
+      },
+      {
+        Action = ["tag:GetResources"]
+        Effect = "Allow"
+        # tfsec:ignore:aws-iam-no-policy-wildcards
         Resource = "*"
       }
     ]
   })
-}
-
-# --- OUTPUTS ---
-# We need these to paste into the Grafana UI
-output "grafana_access_key" {
-  value = aws_iam_access_key.grafana.id
-}
-
-output "grafana_secret_key" {
-  value     = aws_iam_access_key.grafana.secret
-  sensitive = true # Hides the secret from the terminal for security
 }
