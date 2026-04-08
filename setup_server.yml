@@ -1,0 +1,30 @@
+---
+- name: Hardening and Configuring Argus Control Plane
+  hosts: control_plane
+  become: yes # Use sudo
+
+  tasks:
+    - name: 1. Update system cache and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: 2. Install useful CLI tools
+      apt:
+        name:
+          - htop
+          - curl
+          - git
+          - unzip
+        state: present
+
+    - name: 3. Setup the custom Security Banner
+      copy:
+        content: "AUTHORIZED ACCESS ONLY: Project Argus Control Plane\n"
+        dest: /etc/motd
+
+    - name: 4. Install Docker Engine
+      # Tell Ansible only to run it if docker is missing
+      shell: curl -sSL https://get.docker.com/ | sh
+      args:
+        creates: /usr/bin/docker

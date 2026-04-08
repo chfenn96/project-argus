@@ -24,4 +24,7 @@ resource "aws_lambda_function" "monitor_lambda" {
     }
   }
 
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-monitor-function"
+  })
 }

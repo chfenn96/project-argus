@@ -21,3 +21,8 @@ output "app_iam_role_arn" {
   description = "The IAM Role ARN that the Lambda will assume"
   value       = aws_iam_role.app_role.arn
 }
+
+output "control_plane_public_ip" {
+  description = "The public IP address of the Linux control plane"
+  value       = aws_instance.control_plane.public_ip
+}

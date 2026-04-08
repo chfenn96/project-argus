@@ -271,4 +271,10 @@ $RECYCLE.BIN/
 # Zip files
 *.zip
 
+# SHH Keys
+argus_key
+argus_key.pub
+
+inventory.ini
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,python,terraform

@@ -6,8 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- [ ] Phase 5: Self-hosted Linux Runners with Ansible.
 - [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [1.5.0] - 2026-04-08
+
+### Added
+- **Configuration Management:** Integrated Ansible for "Configuration-as-Code" on the management tier.
+- **Automation:** Replaced manual server setup with repeatable, idempotent YAML playbooks.
+- **Security:** Implemented automated system patching and custom access banners on the EC2 control plane.
+- **Tooling:** Automated the deployment of Docker and essential DevOps utilities (htop, unzip, git).
+
+## [1.4.0] - 2026-04-08
+
+### Added
+- **Compute:** Provisioned a dedicated Linux (Ubuntu) EC2 instance to act as an administrative Control Plane.
+- **State Management:** Fully migrated to a remote Terraform backend (S3/DynamoDB) with versioning and encryption-at-rest.
+
+### Changed
+- **IaC Architecture:** Parameterized the infrastructure code using `variables.tf` to support multi-environment reproducibility.
+- **Governance:** Standardized resource metadata using a global tagging strategy for better cloud organization.
+
+### Fixed
+- **Security Audit:** Resolved 10+ high/medium findings from `tfsec`, including IMDSv2 enforcement and S3 public access blocks.
+- **Connectivity:** Resolved SSH "Connection Reset" issues by auditing public IP association and ingress CIDR logic.
 
 ## [1.3.3] - 2026-04-08
 
