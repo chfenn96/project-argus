@@ -9,6 +9,8 @@ from datetime import datetime
 URLS_ENV = os.getenv("URLS_TO_MONITOR", "https://www.google.com")
 URLS_TO_MONITOR = [url.strip() for url in URLS_ENV.split(",")]
 
+SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
+
 
 async def check_uptime(client, url, retries=3):
     """
@@ -56,22 +58,45 @@ async def check_uptime(client, url, retries=3):
 async def run_monitor():
     db = boto3.resource("dynamodb", region_name="us-east-1")
     table = db.Table("ArgusMetrics")
+    sns = boto3.client('sns') # Initialized as you drafted
 
-    # Use a single client session for all pings
     async with httpx.AsyncClient() as client:
-        # Create a list of tasks (one for each URL)
         tasks = [check_uptime(client, url) for url in URLS_TO_MONITOR]
-
-        # MAGIC: Run all pings simultaneously
         results = await asyncio.gather(*tasks)
 
-        # Save results to DynamoDB
+        # 1. Save results to DynamoDB (Your existing working logic)
         for metrics in results:
             try:
                 table.put_item(Item=metrics)
                 print(f"✅ DB SAVE SUCCESS: {metrics['url']}")
             except Exception as e:
                 print(f"❌ DB SAVE FAILURE: {metrics['url']} - Error: {e}")
+
+        # 2. ALERTING LOGIC: Check for failures
+        # We use a list comprehension to find any URLs that are marked "DOWN"
+        failures = [r['url'] for r in results if r['status'] == "DOWN"]
+
+        # Only send the email if the failures list is NOT empty
+        if failures and SNS_TOPIC_ARN:
+            print(f"🚨 Found {len(failures)} failures. Sending SNS Alert...")
+            
+            # Format a clean message for the email
+            failure_list = "\n- ".join(failures)
+            message = (
+                f"Project Argus has detected that the following sites are DOWN:\n\n"
+                f"- {failure_list}\n\n"
+                f"Timestamp: {datetime.utcnow().isoformat()} UTC"
+            )
+
+            try:
+                sns.publish(
+                    TopicArn=SNS_TOPIC_ARN,
+                    Subject="⚠️ CRITICAL: Project Argus Uptime Alert",
+                    Message=message
+                )
+                print("📧 SNS Alert sent successfully.")
+            except Exception as e:
+                print(f"❌ FAILED to send SNS alert: {e}")
 
     return results
 

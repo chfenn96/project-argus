@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [1.8.0] - 2026-04-09
+
+### Added
+- **Incident Response:** Integrated AWS SNS logic into the core engine to provide real-time email alerts for site outages.
+- **Unified Reporting:** Implemented failure aggregation to ensure only one comprehensive alert is sent per monitoring cycle.
+- **Environment Discovery:** Utilized Lambda environment variables to dynamically discover the alerting infrastructure.
+
+### Changed
+- **Operational Maturity:** Moved from a passive "logging-only" state to a proactive "alerting" state, meeting SRE industry standards.
+
 ## [1.7.0] - 2026-04-09
 ### Added
 - **Proactive Alerting:** Provisioned Amazon SNS (Simple Notification Service) as the foundational infrastructure for incident reporting.

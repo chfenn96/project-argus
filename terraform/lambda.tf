@@ -21,6 +21,7 @@ resource "aws_lambda_function" "monitor_lambda" {
     variables = {
       # Add as many URLs as you want here, separated by commas!
       URLS_TO_MONITOR = "https://www.google.com,https://www.github.com,https://www.wikipedia.org"
+      SNS_TOPIC_ARN   = aws_sns_topic.alerts.arn
     }
   }
 
