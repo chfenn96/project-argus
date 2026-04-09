@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Planned
+- **Phase 9-12 (Platform Engineering):** GitOps with ArgoCD, External Secrets (ESO), Istio Service Mesh, and OpenTelemetry Tracing.
+- **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
+- **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
+
+## [1.7.0] - 2026-04-09
+### Added
+- **Proactive Alerting:** Provisioned Amazon SNS (Simple Notification Service) as the foundational infrastructure for incident reporting.
+- **Subscription Logic:** Implemented email-based alerting with externalized PII protection.
+- **IAM Hardening:** Configured execution policies allowing the monitoring engine to publish alerts using the Principle of Least Privilege.
 
 ## [1.6.0] - 2026-04-09
 
