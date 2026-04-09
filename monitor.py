@@ -48,7 +48,7 @@ async def check_uptime(client, url, retries=3):
                 print(f"Final failure for {url}: {e}")
             else:
                 # Exponential backoff (wait longer each time)
-                await asyncio.sleep(2 ** attempt)
+                await asyncio.sleep(2**attempt)
 
     return result
 
