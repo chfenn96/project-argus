@@ -22,11 +22,18 @@ async def check_uptime(client, url, retries=3):
         "status_code": None,
     }
 
+    # ADD THIS LINE: Define a realistic User-Agent
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
     for attempt in range(retries):
         try:
             start_time = time.time()
             # Asynchronous GET request
-            response = await client.get(url, timeout=5.0)
+            response = await client.get(
+                url, timeout=5.0, headers=headers, follow_redirects=True
+            )
             end_time = time.time()
 
             result["response_time_ms"] = round((end_time - start_time) * 1000)
@@ -41,7 +48,7 @@ async def check_uptime(client, url, retries=3):
                 print(f"Final failure for {url}: {e}")
             else:
                 # Exponential backoff (wait longer each time)
-                await asyncio.sleep(2**attempt)
+                await asyncio.sleep(2 ** attempt)
 
     return result
 
@@ -60,8 +67,11 @@ async def run_monitor():
 
         # Save results to DynamoDB
         for metrics in results:
-            print(f"Saving {metrics['url']} - {metrics['status']}")
-            table.put_item(Item=metrics)
+            try:
+                table.put_item(Item=metrics)
+                print(f"✅ DB SAVE SUCCESS: {metrics['url']}")
+            except Exception as e:
+                print(f"❌ DB SAVE FAILURE: {metrics['url']} - Error: {e}")
 
     return results
 
@@ -80,8 +90,11 @@ async def lambda_handler(event, context):
     return {"statusCode": 200, "body": results}
 
 
-# Only for local testing
 if __name__ == "__main__":
-    # Keep asyncio.run here because when running from the terminal,
-    # there is no event loop started yet.
-    asyncio.run(run_monitor())
+    print("Running in Standalone Mode (Kubernetes/Docker)...")
+    try:
+        # This triggers the actual logic when NOT in Lambda
+        asyncio.run(run_monitor())
+        print("Monitoring cycle complete.")
+    except Exception as e:
+        print(f"Standalone execution failed: {e}")

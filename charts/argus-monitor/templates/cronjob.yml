@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "argus-monitor.fullname" . }}
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: monitor
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            command: ["python"]
+            args: ["monitor.py"]
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            env:
+            - name: URLS_TO_MONITOR
+              value: {{ .Values.urls | quote }}
+            - name: AWS_REGION
+              value: "us-east-1"
+            envFrom:
+            - secretRef:
+                name: aws-creds
+          restartPolicy: OnFailure

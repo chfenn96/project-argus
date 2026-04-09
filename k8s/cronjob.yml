@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: argus-monitor-job
+spec:
+  schedule: "*/5 * * * *" # Every 5 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: monitor
+            image: 638175140581.dkr.ecr.us-east-1.amazonaws.com/argus-monitor:latest
+            # CRITICAL: This tells K8s to run the script normally, not as a Lambda
+            command: ["python"]
+            args: ["/var/task/monitor.py"]
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: URLS_TO_MONITOR
+              value: "https://www.google.com,https://www.github.com,https://www.wikipedia.org"
+            - name: AWS_REGION
+              value: "us-east-1"
+            envFrom:
+            - secretRef:
+                name: aws-creds
+          restartPolicy: OnFailure

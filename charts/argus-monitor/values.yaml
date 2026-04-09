@@ -1,0 +1,8 @@
+schedule: "*/5 * * * *"
+
+image:
+  repository: 638175140581.dkr.ecr.us-east-1.amazonaws.com/argus-monitor
+  tag: latest
+  pullPolicy: IfNotPresent
+
+urls: "https://www.google.com,https://www.github.com,https://www.wikipedia.org"

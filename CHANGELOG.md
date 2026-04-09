@@ -6,7 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- [ ] Phase 7: Kubernetes Orchestration (Helm) translation.
+
+## [1.6.0] - 2026-04-09
+
+### Added
+- **Kubernetes Orchestration:** Implemented support for running the monitoring engine as a Kubernetes CronJob.
+- **Helm Integration:** Packaged application as a Helm chart, enabling modular deployment and variable-driven configuration.
+- **Security:** Integrated Kubernetes Secrets for secure credential injection into containerized workloads.
+- **Resilience:** Refactored Python engine to bypass bot-detection using custom User-Agent headers, resolving Wikipedia 403 errors.
+
+### Changed
+- **Architectural Portability:** Verified the same Docker artifact functions seamlessly across both AWS Lambda and local K8s runtimes.
+- **Persistence Layer:** Successfully validated cross-platform data ingestion into the AWS DynamoDB metrics table.
 
 ## [1.5.0] - 2026-04-08
 
