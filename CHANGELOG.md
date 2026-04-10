@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [2.1.0] - 2026-04-10
+### Changed
+- **Repository Architecture:** Migrated to an Enterprise-grade directory hierarchy (`app/`, `deploy/`, `infra/`, `tests/`) to isolate concerns between application logic and infrastructure.
+- **Docker Strategy:** Updated `Dockerfile` to utilize the new `/app` source directory while maintaining AWS Lambda task root compatibility.
+- **GitOps Routing:** Reconfigured ArgoCD Application manifests to track relocated Helm charts in `deploy/charts/`.
+- **Test Orchestration:** Refactored `pytest` suite to support package-based imports and updated `unittest.mock` targets to reflect the new module paths.
+
+### Fixed
+- **CI/CD Paths:** Updated GitHub Actions workflow logic to ensure linting (Black/Flake8) and testing phases target the correct subdirectories.
+- **Python Module Resolution:** Resolved `ModuleNotFoundError` during test collection by implementing `__init__.py` package markers.
+
 ## [2.0.0] - 2026-04-10
 ### Added
 - **GitOps:** Integrated ArgoCD for declarative management of the Kubernetes cluster.
