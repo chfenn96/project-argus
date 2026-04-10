@@ -73,4 +73,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name project-argus-monitor-function \
-            --image-uri ${{ steps.login-ecr.outputs.registry }}/argus-monitor:${{ github.sha }}
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/project-argus-monitor:${{ github.sha }}
