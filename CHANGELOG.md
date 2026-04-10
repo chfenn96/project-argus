@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [1.9.0] - 2026-04-10
+### Added
+- **SRE Framework:** Implemented Service Level Objective (SLO) tracking for system availability.
+- **Telemetry Pipeline:** Configured CloudWatch Metric Filters to transform raw JSON execution logs into actionable numerical metrics.
+- **Advanced Visualization:** Added an Availability SLO Gauge to the Grafana dashboard using cross-namespace metric math.
+- **Log Governance:** Explicitly provisioned managed Log Groups with defined retention policies for cost-optimization.
+
 ## [1.8.0] - 2026-04-09
 
 ### Added

@@ -39,9 +39,10 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 - [x] Phase 5: Observability (CloudWatch & Grafana Cloud).
 - [x] Phase 6: Linux Systems (EC2 Provisioning & Ansible Automation).
 - [x] Phase 7: Kubernetes Orchestration (Local K8s & Helm Packaging).
+- [x] Phase 8: SRE Fundamentals (Proactive Alerting & SLOs).
 
 ### 🚀 Level 3: SRE & Platform Engineering (Current)
-- [ ] **Phase 8: SRE Fundamentals (Proactive Alerting & SLOs)** 👈 *Current Phase*
-- [ ] Phase 9-12: GitOps, Advanced Secrets, Service Mesh, and Distributed Tracing.
+- [ ] **Phase 9: GitOps Deployment (ArgoCD)** 👈 *Current Phase*
+- [ ] Phase 10-12: Advanced Secrets, Service Mesh, and Distributed Tracing.
 - [ ] Phase 13-15: Multi-Region High Availability, Chaos Engineering, and ChatOps.
 - [ ] Phase 16-20: FinOps, Runtime Security, Policy as Code, and AIOps.

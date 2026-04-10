@@ -32,7 +32,7 @@ resource "aws_dynamodb_table" "monitoring_results" {
 
 # Add a policy to App Role so it can actually WRITE to this table
 resource "aws_iam_role_policy" "dynamodb_write_policy" {
-  name = "argus-dynamodb-policy"
+  name = "${var.project_name}-dynamodb-policy"
   role = aws_iam_role.app_role.id
 
   policy = jsonencode({

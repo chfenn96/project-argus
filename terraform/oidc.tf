@@ -7,7 +7,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 resource "aws_iam_role" "github_actions_role" {
-  name = "argus-github-actions-role"
+  name = "${var.project_name}-github-actions-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -29,7 +29,7 @@ resource "aws_iam_role" "github_actions_role" {
 }
 
 resource "aws_iam_role_policy" "github_actions_policy" {
-  name = "argus-github-deploy-policy"
+  name = "${var.project_name}-github-deploy-policy"
   role = aws_iam_role.github_actions_role.id
 
   policy = jsonencode({

@@ -1,6 +1,9 @@
 # 1. The Megaphone
+# tfsec:ignore:aws-sns-topic-encryption-use-cmk (FinOps: Using AWS-managed key to avoid KMS costs)
 resource "aws_sns_topic" "alerts" {
   name = "${var.project_name}-alerts"
+  # ADD THIS: Enable encryption using the default AWS key (Free)
+  kms_master_key_id = "alias/aws/sns"
   tags = merge(local.common_tags, {
     Name = "${var.project_name}-alerts"
   })
@@ -15,7 +18,7 @@ resource "aws_sns_topic_subscription" "email_alert" {
 
 # 3. Giving the Worker permission to use the megaphone
 resource "aws_iam_role_policy" "sns_publish_policy" {
-  name = "argus-sns-policy"
+  name = "${var.project_name}-sns-policy"
   role = aws_iam_role.app_role.id
 
   policy = jsonencode({
