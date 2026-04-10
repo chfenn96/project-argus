@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/chfenn96/project-argus
     targetRevision: HEAD
-    path: charts/argus-monitor  # Path to Helm chart
+    path: deploy/charts/argus-monitor  # Path to Helm chart
   destination:
     server: https://kubernetes.default.svc
     namespace: default # Where the monitor logic actually runs
