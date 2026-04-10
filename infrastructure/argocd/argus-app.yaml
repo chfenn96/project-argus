@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: project-argus-monitor
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/chfenn96/project-argus
+    targetRevision: HEAD
+    path: charts/argus-monitor  # Path to Helm chart
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default # Where the monitor logic actually runs
+  syncPolicy:
+    automated:
+      prune: true      # Deletes resources if removed from Git
+      selfHeal: true   # Overwrites manual 'kubectl' changes

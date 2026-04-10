@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Planned
-- **Phase 9-12 (Platform Engineering):** GitOps with ArgoCD, External Secrets (ESO), Istio Service Mesh, and OpenTelemetry Tracing.
+- **Phase 11-12 (Platform Engineering):** Istio Service Mesh, and OpenTelemetry Tracing.
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
+
+## [2.0.0] - 2026-04-10
+### Added
+- **GitOps:** Integrated ArgoCD for declarative management of the Kubernetes cluster.
+- **Secrets Management:** Implemented External Secrets Operator (ESO) to pull credentials directly from AWS Secrets Manager.
+- **Automation:** Created `SecretStore` and `ExternalSecret` manifests for automated credential rotation.
+- **Resiliency:** Enabled `selfHeal` in ArgoCD to prevent manual configuration drift.
+
+### Fixed
+- **CRD Conflict:** Resolved `selectableFields` API error by pinning ESO to version 0.9.11 and manually reconciling CRDs.
+- **Auth:** Fixed `ExpiredTokenException` by implementing a workflow for refreshing AWS SSO session tokens within K8s secrets.
 
 ## [1.9.0] - 2026-04-10
 ### Added
