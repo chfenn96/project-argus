@@ -26,24 +26,27 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # Use the dev file so we get pytest and respx!
-          pip install -r requirements-dev.txt
+          # Path updated to app/ folder
+          pip install -r app/requirements-dev.txt
 
       - name: Check Formatting (Black)
-        run: black --check monitor.py test_monitor.py
+        # Paths updated to app/ and tests/ folders
+        run: black --check app/monitor.py tests/test_monitor.py
 
       - name: Run Linter (Flake8)
-        run: flake8 monitor.py test_monitor.py
+        # Paths updated to app/ and tests/ folders
+        run: flake8 app/monitor.py tests/test_monitor.py
 
       - name: Run Unit Tests (Pytest)
-        run: pytest test_monitor.py
+        # Path updated to tests/ folder
+        run: pytest tests/test_monitor.py
 
       - name: Terraform Security Scan (tfsec)
         uses: aquasecurity/tfsec-action@v1.0.0
 
   # --- JOB 2: THE DEPLOYMENT (CD) ---
   deploy:
-    needs: test # THIS IS THE GATE: Only run if 'test' passes!
+    needs: test 
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -64,8 +67,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: project-argus-monitor
-          IMAGE_TAG: ${{ github.sha }} # USE THE UNIQUE COMMIT ID
+          IMAGE_TAG: ${{ github.sha }} 
         run: |
+          # We keep the build context as "." (the root) 
+          # so Docker can see the Dockerfile and the app/ folder
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 

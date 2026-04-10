@@ -2,7 +2,9 @@ import pytest
 import respx
 import httpx
 from unittest.mock import MagicMock, patch
-from monitor import check_uptime, run_monitor
+
+# UPDATED: Import from the 'app' package
+from app.monitor import check_uptime, run_monitor
 
 
 @pytest.mark.asyncio
@@ -34,8 +36,9 @@ async def test_check_uptime_retry_logic():
 
 
 @pytest.mark.asyncio
-@patch("monitor.boto3.resource")
-@patch("monitor.boto3.client")
+# UPDATED: The patch target must match the new package path
+@patch("app.monitor.boto3.resource")
+@patch("app.monitor.boto3.client")
 async def test_run_monitor_db_and_sns(mock_sns_client, mock_db_resource):
     # Mock DynamoDB
     mock_table = MagicMock()

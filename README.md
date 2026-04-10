@@ -32,17 +32,31 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 * **Automated Testing:** Commits are gated by `pytest` unit tests and `tfsec` static analysis for Terraform.
 
 ## 📅 Development Roadmap
+
 ### ✅ Level 1: The Core Foundation
-- [x] Phase 1-4: Python Engine, Docker, Terraform, and Zero-Trust CI/CD.
+- [x] **Phases 1-4: The Engine & The Cloud.** Python Engine (asyncio), Dockerization, Terraform AWS Base, and Zero-Trust OIDC CI/CD.
 
 ### ✅ Level 2: Infrastructure & Orchestration
-- [x] Phase 5: Observability (CloudWatch & Grafana Cloud).
-- [x] Phase 6: Linux Systems (EC2 Provisioning & Ansible Automation).
-- [x] Phase 7: Kubernetes Orchestration (Local K8s & Helm Packaging).
-- [x] Phase 8: SRE Fundamentals (Proactive Alerting & SLOs).
+- [x] **Phases 5-8: Reliability Engineering.** Multi-source Observability (Grafana Cloud), Ansible Linux Automation, Helm Packaging, and SNS/SLO Alerting.
 
-### 🚀 Level 3: SRE & Platform Engineering (Current)
-- [ ] **Phase 9: GitOps Deployment (ArgoCD)** 👈 *Current Phase*
-- [ ] Phase 10-12: Advanced Secrets, Service Mesh, and Distributed Tracing.
-- [ ] Phase 13-15: Multi-Region High Availability, Chaos Engineering, and ChatOps.
-- [ ] Phase 16-20: FinOps, Runtime Security, Policy as Code, and AIOps.
+### ✅ Level 3: Platform Engineering (Current)
+- [x] **Phase 9: GitOps Deployment (ArgoCD).** Transitioned from imperative Helm commands to declarative, self-healing GitOps reconciliation. 
+- [x] **Phase 10: Enterprise Secrets Management (ESO).** Integrated External Secrets Operator with AWS Secrets Manager to eliminate static K8s secrets.
+- [ ] **Phase 11: Service Mesh & Zero-Trust (Istio/Linkerd)** 👈 *Current Phase*
+    - *Objective:* Implement mTLS, circuit breaking, and automated traffic encryption between Argus components.
+- [ ] **Phase 12: Distributed Tracing & APM (OpenTelemetry).**
+    - *Objective:* Instrument Python logic to track request latency waterfalls for every site pinged.
+
+### 🚀 Level 4: Advanced Resilience & Scaling
+- [ ] **Phase 13: Chaos Engineering (Litmus/Chaos Mesh).**
+    - *Objective:* Intentionally "kill" AWS regions or K8s nodes to verify Argus fails over gracefully.
+- [ ] **Phase 14: Multi-Region High Availability.**
+    - *Objective:* Deploy Argus across us-east-1 and eu-west-1 with Global DynamoDB Tables.
+- [ ] **Phase 15: ChatOps & AI Remediation.**
+    - *Objective:* Integrate Slack/Discord bots that allow "Acknowledging" alerts directly from the phone.
+
+### 💰 Level 5: Governance & Optimization
+- [ ] **Phase 16-18: FinOps & Policy as Code (Kyverno/OPA).**
+    - *Objective:* Implement cost-capping on AWS resources and gate Git commits based on security policies.
+- [ ] **Phase 19-20: AIOps Integration.**
+    - *Objective:* Use LLMs to analyze pings for "anomaly detection" rather than just static uptime/downtime.

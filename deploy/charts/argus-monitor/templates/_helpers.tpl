@@ -1,10 +1,10 @@
 {{/* Define the name of the chart */}}
-{{- define "argus-monitor.name" -}}
+{{- define "project-argus-monitor.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/* Define a fully qualified app name */}}
-{{- define "argus-monitor.fullname" -}}
+{{- define "project-argus-monitor.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
