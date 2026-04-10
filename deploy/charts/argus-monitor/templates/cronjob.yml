@@ -11,16 +11,26 @@ spec:
       template:
         metadata:
           annotations:
+            # 1. Ensure the Istio sidecar is injected
             sidecar.istio.io/inject: "true"
+            # 2. Block the app until the proxy is ready (prevents network errors at startup)
             proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
         spec:
+          # 3. Use the ECR secret we created in Phase 10
           imagePullSecrets:
             - name: regcred
           containers:
           - name: monitor
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-            command: ["python"]
-            args: ["monitor.py"]
+            # 4. Use a shell wrapper to manually kill the Istio sidecar upon completion
+            command: ["/bin/sh", "-c"]
+            args: 
+              - |
+                python monitor.py;
+                EXIT_CODE=$?;
+                echo "Monitor finished with exit code $EXIT_CODE. Signalling Istio-Proxy to exit...";
+                curl -sf -X POST http://localhost:15020/quitquitquit;
+                exit $EXIT_CODE;
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             env:
             - name: URLS_TO_MONITOR
