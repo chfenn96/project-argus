@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [2.2.0] - 2026-04-10
+### Added
+- **GitOps Management:** Deployed ArgoCD to manage the "Argus" application lifecycle declaratively.
+- **Secrets Automation:** Implemented External Secrets Operator (ESO) to bridge the cluster with AWS Secrets Manager, eliminating manual secret rotation.
+- **Service Mesh (Istio):** Bootstrapped Istio Service Mesh to provide a foundation for mTLS and granular network observability.
+- **Mesh-Aware Helm Chart:** Added Istio toggle and lifecycle annotations to the CronJob template.
+
+### Changed
+- **Directory Hierarchy:** Finalized the migration to a clean `app/`, `deploy/`, and `infra/` structure.
+- **Application Pathing:** Reconfigured ArgoCD and Docker build contexts to support the new directory architecture.
+
+### Fixed
+- **Zombie Sidecar Issue:** Implemented `proxy.istio.io/config` lifecycle hooks to ensure the `istio-proxy` terminates gracefully upon CronJob completion.
+- **ESO Versioning:** Resolved CRD versioning conflicts by pinning ESO to v0.9.11 and manually reconciling the API schema.
+
+### Security
+- **Zero-Trust Foundation:** Enabled sidecar injection in the `default` namespace to prepare for strict mTLS.
+- **Exclusion Rules:** Updated `.gitignore` to prevent vendor binaries (`istio-*/`) and private keys from entering version control.
+
 ## [2.1.0] - 2026-04-10
 ### Changed
 - **Repository Architecture:** Migrated to an Enterprise-grade directory hierarchy (`app/`, `deploy/`, `infra/`, `tests/`) to isolate concerns between application logic and infrastructure.

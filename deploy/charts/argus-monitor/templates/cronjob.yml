@@ -1,12 +1,21 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "argus-monitor.fullname" . }}
+  name: {{ include "project-argus-monitor.fullname" . }}
+labels:
+  {{- include "project-argus-monitor.labels" . | nindent 4 }}
 spec:
   schedule: {{ .Values.schedule | quote }}
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            # 1. Ensure the sidecar is injected
+            sidecar.istio.io/inject: "true"
+            # 2. Prevent the app from starting until the proxy is ready
+            # and allow the proxy to shut down when the app finishes.
+            proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
         spec:
           containers:
           - name: monitor
