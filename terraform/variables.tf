@@ -14,3 +14,8 @@ variable "my_ip" {
   description = "My home IP address for SSH access"
   type        = string
 }
+
+variable "alert_email" {
+  description = "The email address to receive uptime alerts"
+  type        = string
+}

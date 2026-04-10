@@ -32,10 +32,17 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 * **Automated Testing:** Commits are gated by `pytest` unit tests and `tfsec` static analysis for Terraform.
 
 ## 📅 Development Roadmap
-- [x] Phase 1: Core Python Engine & Docker Containerization
-- [x] Phase 2: Custom AWS VPC Networking & IAM Security
-- [x] Phase 3: Terraform & Serverless Infrastructure Deployment
-- [x] Phase 4: GitHub Actions CI/CD Pipeline
-- [x] Phase 5: Self-hosted Linux Runners with Ansible
-- [x] Phase 6: Grafana Observability Integration
-- [x] Phase 7: Kubernetes Orchestration (Helm) translation
+### ✅ Level 1: The Core Foundation
+- [x] Phase 1-4: Python Engine, Docker, Terraform, and Zero-Trust CI/CD.
+
+### ✅ Level 2: Infrastructure & Orchestration
+- [x] Phase 5: Observability (CloudWatch & Grafana Cloud).
+- [x] Phase 6: Linux Systems (EC2 Provisioning & Ansible Automation).
+- [x] Phase 7: Kubernetes Orchestration (Local K8s & Helm Packaging).
+- [x] Phase 8: SRE Fundamentals (Proactive Alerting & SLOs).
+
+### 🚀 Level 3: SRE & Platform Engineering (Current)
+- [ ] **Phase 9: GitOps Deployment (ArgoCD)** 👈 *Current Phase*
+- [ ] Phase 10-12: Advanced Secrets, Service Mesh, and Distributed Tracing.
+- [ ] Phase 13-15: Multi-Region High Availability, Chaos Engineering, and ChatOps.
+- [ ] Phase 16-20: FinOps, Runtime Security, Policy as Code, and AIOps.

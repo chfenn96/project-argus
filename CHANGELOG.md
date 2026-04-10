@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Planned
+- **Phase 9-12 (Platform Engineering):** GitOps with ArgoCD, External Secrets (ESO), Istio Service Mesh, and OpenTelemetry Tracing.
+- **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
+- **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
+
+## [1.9.0] - 2026-04-10
+### Added
+- **SRE Framework:** Implemented Service Level Objective (SLO) tracking for system availability.
+- **Telemetry Pipeline:** Configured CloudWatch Metric Filters to transform raw JSON execution logs into actionable numerical metrics.
+- **Advanced Visualization:** Added an Availability SLO Gauge to the Grafana dashboard using cross-namespace metric math.
+- **Log Governance:** Explicitly provisioned managed Log Groups with defined retention policies for cost-optimization.
+
+## [1.8.0] - 2026-04-09
+
+### Added
+- **Incident Response:** Integrated AWS SNS logic into the core engine to provide real-time email alerts for site outages.
+- **Unified Reporting:** Implemented failure aggregation to ensure only one comprehensive alert is sent per monitoring cycle.
+- **Environment Discovery:** Utilized Lambda environment variables to dynamically discover the alerting infrastructure.
+
+### Changed
+- **Operational Maturity:** Moved from a passive "logging-only" state to a proactive "alerting" state, meeting SRE industry standards.
+
+## [1.7.0] - 2026-04-09
+### Added
+- **Proactive Alerting:** Provisioned Amazon SNS (Simple Notification Service) as the foundational infrastructure for incident reporting.
+- **Subscription Logic:** Implemented email-based alerting with externalized PII protection.
+- **IAM Hardening:** Configured execution policies allowing the monitoring engine to publish alerts using the Principle of Least Privilege.
 
 ## [1.6.0] - 2026-04-09
 

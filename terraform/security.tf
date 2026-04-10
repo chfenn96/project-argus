@@ -1,6 +1,6 @@
 # 1. IAM Role for our Monitoring App
 resource "aws_iam_role" "app_role" {
-  name = "argus-app-role"
+  name = "${var.project_name}-app-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,13 @@ resource "aws_iam_role" "app_role" {
   })
 }
 
-# 2. Security Group (The "Virtual Firewall")
+# 2. This gives the Lambda permission to write logs to CloudWatch
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.app_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# 3. Security Group (The "Virtual Firewall")
 resource "aws_security_group" "app_sg" {
   name        = "${var.project_name}-app-sg"
   description = "Allow outbound traffic for monitoring"

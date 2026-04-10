@@ -1,1 +1,2 @@
 my_ip = "YOUR_IP_HERE/32"
+alert_email = "YOUR@EMAIL.com"

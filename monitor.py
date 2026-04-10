@@ -1,19 +1,23 @@
 import asyncio
 import httpx
 import boto3
+import json
 import time
 import os
 from datetime import datetime
 
-# FIX: Get URLs from Environment Variables (No more hardcoding!)
-URLS_ENV = os.getenv("URLS_TO_MONITOR", "https://www.google.com")
+# 1. Configuration from environment
+URLS_ENV = os.getenv(
+    "URLS_TO_MONITOR",
+    "https://www.google.com,https://www.github.com,https://www.wikipedia.org",
+)
 URLS_TO_MONITOR = [url.strip() for url in URLS_ENV.split(",")]
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
+SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")  # Re-added for alerting
 
 
 async def check_uptime(client, url, retries=3):
-    """
-    Pings a URL asynchronously with retry logic.
-    """
+    """Pings a URL with browser headers and retry logic."""
     result = {
         "url": url,
         "timestamp": datetime.utcnow().isoformat(),
@@ -21,8 +25,6 @@ async def check_uptime(client, url, retries=3):
         "response_time_ms": 0,
         "status_code": None,
     }
-
-    # ADD THIS LINE: Define a realistic User-Agent
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
@@ -30,71 +32,74 @@ async def check_uptime(client, url, retries=3):
     for attempt in range(retries):
         try:
             start_time = time.time()
-            # Asynchronous GET request
             response = await client.get(
                 url, timeout=5.0, headers=headers, follow_redirects=True
             )
-            end_time = time.time()
 
-            result["response_time_ms"] = round((end_time - start_time) * 1000)
+            result["response_time_ms"] = round((time.time() - start_time) * 1000)
             result["status_code"] = response.status_code
 
-            if response.status_code >= 200 and response.status_code < 300:
+            if 200 <= response.status_code < 300:
                 result["status"] = "UP"
-                return result  # Success!
+                return result
 
         except Exception as e:
-            if attempt == retries - 1:
-                print(f"Final failure for {url}: {e}")
-            else:
-                # Exponential backoff (wait longer each time)
-                await asyncio.sleep(2**attempt)
+            print(f"Attempt {attempt + 1} failed for {url}: {e}")
+            if attempt < retries - 1:
+                # Exponential backoff: 0.1s, 0.2s, 0.4s...
+                await asyncio.sleep(0.1 * (2**attempt))
 
     return result
 
 
 async def run_monitor():
-    db = boto3.resource("dynamodb", region_name="us-east-1")
+    """Core logic: Pings sites, saves to DB, and sends alerts."""
+    # Explicitly set region for all clients
+    db = boto3.resource("dynamodb", region_name=AWS_REGION)
     table = db.Table("ArgusMetrics")
+    sns = boto3.client("sns", region_name=AWS_REGION)
 
-    # Use a single client session for all pings
     async with httpx.AsyncClient() as client:
-        # Create a list of tasks (one for each URL)
         tasks = [check_uptime(client, url) for url in URLS_TO_MONITOR]
-
-        # MAGIC: Run all pings simultaneously
         results = await asyncio.gather(*tasks)
 
-        # Save results to DynamoDB
         for metrics in results:
+            # CRITICAL: json.dumps ensures double quotes for CloudWatch Filters
+            print(json.dumps(metrics))
             try:
                 table.put_item(Item=metrics)
-                print(f"✅ DB SAVE SUCCESS: {metrics['url']}")
             except Exception as e:
-                print(f"❌ DB SAVE FAILURE: {metrics['url']} - Error: {e}")
+                print(f"❌ DB SAVE FAILURE: {e}")
+
+        # --- RE-ADDED ALERTING LOGIC ---
+        failures = [r["url"] for r in results if r["status"] == "DOWN"]
+        if failures and SNS_TOPIC_ARN:
+            print(f"🚨 Found {len(failures)} failures. Sending SNS Alert...")
+            failure_list = "\n- ".join(failures)
+            message = f"Project Argus detected outages:\n\n- {failure_list}\n\nTimestamp: {datetime.utcnow().isoformat()}"
+            try:
+                sns.publish(
+                    TopicArn=SNS_TOPIC_ARN, Subject="⚠️ Argus Alert", Message=message
+                )
+                print("📧 Alert sent.")
+            except Exception as e:
+                print(f"❌ SNS FAILURE: {e}")
+        # -------------------------------
 
     return results
 
 
-async def lambda_handler(event, context):
-    """
-    AWS Lambda natively supports 'async def'.
-    Removing asyncio.run() prevents loop conflicts during testing and
-    follows AWS best practices for async runtimes.
-    """
+def lambda_handler(event, context):
+    """AWS Lambda entry point: Standard sync wrapper for async work."""
     print("Lambda handler started...")
+    # This executes the async work and WAITS for the real list result
+    output = asyncio.run(run_monitor())
 
-    # Just 'await' the coroutine directly
-    results = await run_monitor()
-
-    return {"statusCode": 200, "body": results}
+    return {"statusCode": 200, "body": output}
 
 
 if __name__ == "__main__":
-    print("Running in Standalone Mode (Kubernetes/Docker)...")
-    try:
-        # This triggers the actual logic when NOT in Lambda
-        asyncio.run(run_monitor())
-        print("Monitoring cycle complete.")
-    except Exception as e:
-        print(f"Standalone execution failed: {e}")
+    print("Running local verification...")
+    final_output = lambda_handler(None, None)
+    print("\n--- FINAL OUTPUT TO AWS ---")
+    print(json.dumps(final_output, indent=2))

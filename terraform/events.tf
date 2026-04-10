@@ -1,6 +1,6 @@
 # 1. THE CLOCK: Trigger every 5 minutes
 resource "aws_cloudwatch_event_rule" "every_five_minutes" {
-  name                = "argus-check-timer"
+  name                = "${var.project_name}-check-timer"
   description         = "Triggers the Argus Uptime Monitor every 5 minutes"
   schedule_expression = "rate(5 minutes)" 
 }
