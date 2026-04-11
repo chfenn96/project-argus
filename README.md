@@ -42,9 +42,9 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 ### ✅ Level 3: Platform Engineering (Current)
 - [x] **Phase 9: GitOps Deployment (ArgoCD).** Transitioned from imperative Helm commands to declarative, self-healing GitOps reconciliation. 
 - [x] **Phase 10: Enterprise Secrets Management (ESO).** Integrated External Secrets Operator with AWS Secrets Manager to eliminate static K8s secrets.
-- [ ] **Phase 11: Service Mesh & Zero-Trust (Istio/Linkerd)** 👈 *Current Phase*
+- [x] **Phase 11: Service Mesh & Zero-Trust (Istio/Linkerd)**
     - *Objective:* Implement mTLS, circuit breaking, and automated traffic encryption between Argus components.
-- [ ] **Phase 12: Distributed Tracing & APM (OpenTelemetry).**
+- [ ] **Phase 12: Distributed Tracing & APM (OpenTelemetry).** 👈 *Current Phase*
     - *Objective:* Instrument Python logic to track request latency waterfalls for every site pinged.
 
 ### 🚀 Level 4: Advanced Resilience & Scaling
