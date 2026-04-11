@@ -1,8 +1,15 @@
 schedule: "*/5 * * * *"
 
 image:
-  repository: 638175140581.dkr.ecr.us-east-1.amazonaws.com/argus-monitor
+  repository: 638175140581.dkr.ecr.us-east-1.amazonaws.com/project-argus-monitor
   tag: latest
   pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: regcred
 
 urls: "https://www.google.com,https://www.github.com,https://www.wikipedia.org"
+
+istio:
+  enabled: true
+  # Set to true to force proxy to exit when monitor finishes
+  quitProxyOnExit: true
