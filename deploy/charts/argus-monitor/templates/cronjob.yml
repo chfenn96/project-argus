@@ -25,10 +25,12 @@ spec:
             # 4. Use a shell wrapper to manually kill the Istio sidecar upon completion
             command: ["/bin/sh", "-c"]
             args: 
+            # Add a 5 second sleep BEFORE the quitquitquit to allow OTel to flush
               - |
                 python monitor.py;
                 EXIT_CODE=$?;
-                echo "Monitor finished with exit code $EXIT_CODE. Signalling Istio-Proxy to exit...";
+                echo "Pings finished. Waiting for OTel trace flush...";
+                sleep 5; 
                 curl -sf -X POST http://localhost:15020/quitquitquit;
                 exit $EXIT_CODE;
             imagePullPolicy: {{ .Values.image.pullPolicy }}

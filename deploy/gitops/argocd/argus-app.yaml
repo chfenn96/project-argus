@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/chfenn96/project-argus
-    targetRevision: main
+    targetRevision: feat-distributed-tracing
     path: deploy/charts/argus-monitor  # Path to Helm chart
   destination:
     server: https://kubernetes.default.svc

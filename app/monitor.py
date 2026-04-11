@@ -6,85 +6,97 @@ import time
 import os
 from datetime import datetime
 
-# 1. Configuration from environment
-URLS_ENV = os.getenv(
-    "URLS_TO_MONITOR",
-    "https://www.google.com,https://www.github.com,https://www.wikipedia.org",
-)
+# --- OPENTELEMETRY IMPORTS ---
+from opentelemetry import trace
+from opentelemetry.sdk.resources import RESOURCE_ATTRIBUTES, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
+# 1. Setup OTel (Only if in K8s/Mesh environment)
+# In Lambda, this would typically point to AWS X-Ray, but here we point to the Istio sidecar.
+resource = Resource(attributes={
+    RESOURCE_ATTRIBUTES["SERVICE_NAME"]: "project-argus-monitor"
+})
+provider = TracerProvider(resource=resource)
+# Istio sidecar listens for OTLP/gRPC on localhost:4317
+processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True))
+provider.add_span_processor(processor)
+trace.set_tracer_provider(provider)
+tracer = trace.get_tracer(__name__)
+
+# Auto-instrument all httpx clients
+HTTPXClientInstrumentor().instrument()
+
+# --- CONFIGURATION ---
+URLS_ENV = os.getenv("URLS_TO_MONITOR", "https://www.google.com,https://www.github.com,https://www.wikipedia.org")
 URLS_TO_MONITOR = [url.strip() for url in URLS_ENV.split(",")]
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")  # Re-added for alerting
+SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
 
 
 async def check_uptime(client, url, retries=3):
     """Pings a URL with browser headers and retry logic."""
-    result = {
-        "url": url,
-        "timestamp": datetime.utcnow().isoformat(),
-        "status": "DOWN",
-        "response_time_ms": 0,
-        "status_code": None,
-    }
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+    with tracer.start_as_current_span(f"ping_{url}") as span:
+        result = {
+            "url": url,
+            "timestamp": datetime.utcnow().isoformat(),
+            "status": "DOWN",
+            "response_time_ms": 0,
+            "status_code": None,
+        }
+        headers = {"User-Agent": "ArgusMonitor/v2.2.0 (SRE Portfolio Project)"}
 
-    for attempt in range(retries):
-        try:
-            start_time = time.time()
-            response = await client.get(
-                url, timeout=5.0, headers=headers, follow_redirects=True
-            )
+        for attempt in range(retries):
+            try:
+                start_time = time.time()
+                response = await client.get(url, timeout=5.0, headers=headers, follow_redirects=True)
+                
+                result["response_time_ms"] = round((time.time() - start_time) * 1000)
+                result["status_code"] = response.status_code
+                
+                # Add metadata to the trace span
+                span.set_attribute("http.status_code", response.status_code)
+                span.set_attribute("argus.attempt", attempt + 1)
 
-            result["response_time_ms"] = round((time.time() - start_time) * 1000)
-            result["status_code"] = response.status_code
+                if 200 <= response.status_code < 300:
+                    result["status"] = "UP"
+                    return result
 
-            if 200 <= response.status_code < 300:
-                result["status"] = "UP"
-                return result
-
-        except Exception as e:
-            print(f"Attempt {attempt + 1} failed for {url}: {e}")
-            if attempt < retries - 1:
-                # Exponential backoff: 0.1s, 0.2s, 0.4s...
-                await asyncio.sleep(0.1 * (2**attempt))
-
-    return result
+            except Exception as e:
+                span.record_exception(e)
+                if attempt < retries - 1:
+                    await asyncio.sleep(0.1 * (2**attempt))
+        return result
 
 
 async def run_monitor():
     """Core logic: Pings sites, saves to DB, and sends alerts."""
     # Explicitly set region for all clients
-    db = boto3.resource("dynamodb", region_name=AWS_REGION)
-    table = db.Table("ArgusMetrics")
-    sns = boto3.client("sns", region_name=AWS_REGION)
+    with tracer.start_as_current_span("run_monitor_loop"):
+        db = boto3.resource("dynamodb", region_name=AWS_REGION)
+        table = db.Table("ArgusMetrics")
+        sns = boto3.client("sns", region_name=AWS_REGION)
 
-    async with httpx.AsyncClient() as client:
-        tasks = [check_uptime(client, url) for url in URLS_TO_MONITOR]
-        results = await asyncio.gather(*tasks)
+        async with httpx.AsyncClient() as client:
+            tasks = [check_uptime(client, url) for url in URLS_TO_MONITOR]
+            results = await asyncio.gather(*tasks)
 
-        for metrics in results:
-            # CRITICAL: json.dumps ensures double quotes for CloudWatch Filters
-            print(json.dumps(metrics))
-            try:
-                table.put_item(Item=metrics)
-            except Exception as e:
-                print(f"❌ DB SAVE FAILURE: {e}")
+            for metrics in results:
+                print(json.dumps(metrics))
+                # Span for Database interaction
+                with tracer.start_as_current_span("dynamodb_save"):
+                    try:
+                        table.put_item(Item=metrics)
+                    except Exception as e:
+                        print(f"❌ DB SAVE FAILURE: {e}")
 
-        # --- RE-ADDED ALERTING LOGIC ---
-        failures = [r["url"] for r in results if r["status"] == "DOWN"]
-        if failures and SNS_TOPIC_ARN:
-            print(f"🚨 Found {len(failures)} failures. Sending SNS Alert...")
-            failure_list = "\n- ".join(failures)
-            message = f"Project Argus detected outages:\n\n- {failure_list}\n\nTimestamp: {datetime.utcnow().isoformat()}"
-            try:
-                sns.publish(
-                    TopicArn=SNS_TOPIC_ARN, Subject="⚠️ Argus Alert", Message=message
-                )
-                print("📧 Alert sent.")
-            except Exception as e:
-                print(f"❌ SNS FAILURE: {e}")
-        # -------------------------------
+            failures = [r["url"] for r in results if r["status"] == "DOWN"]
+            if failures and SNS_TOPIC_ARN:
+                with tracer.start_as_current_span("sns_alert"):
+                    message = f"Project Argus detected outages:\n\n- " + "\n- ".join(failures)
+                    sns.publish(TopicArn=SNS_TOPIC_ARN, Subject="⚠️ Argus Alert", Message=message)
 
     return results
 

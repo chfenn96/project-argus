@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [2.3.0] - 2026-04-11
+### Added
+- **Distributed Tracing:** Integrated OpenTelemetry (OTel) to provide request-level visibility across the monitoring lifecycle.
+- **Trace Spans:** Implemented granular spans for HTTP pings (`ping_<url>`) and DynamoDB operations (`dynamodb_save`) to identify latency bottlenecks.
+- **Jaeger Integration:** Deployed Jaeger within the `istio-system` namespace to aggregate and visualize distributed traces.
+- **Automated Instrumentation:** Leveraged `opentelemetry-instrumentation-httpx` for zero-code header propagation between the engine and the Service Mesh.
+
+### Changed
+- **CronJob Lifecycle:** Modified the shell wrapper in `cronjob.yml` to include a 5-second sleep, ensuring the OTel BatchProcessor flushes all spans before the Istio sidecar terminates.
+- **Dependencies:** Added OTel API, SDK, and OTLP exporters to `app/requirements.txt`.
+
+### Fixed
+- **Trace Loss:** Resolved an issue where traces were dropped during Pod termination by synchronizing the application exit signal with the OTel exporter buffer.
+
 ## [2.2.0] - 2026-04-10
 ### Added
 - **GitOps Management:** Deployed ArgoCD to manage the "Argus" application lifecycle declaratively.
