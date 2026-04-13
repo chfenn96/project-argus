@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [2.3.1] - 2026-04-13
+### Fixed
+- **OTel Dependency Resolution:** Resolved a critical `ImportError` caused by a breaking change in the `opentelemetry-sdk` (v1.24+). Migrated from deprecated `RESOURCE_ATTRIBUTES` to standard string-key resource mapping for service identification.
+- **Trace Export Pipeline:** Corrected gRPC transport errors (`StatusCode.UNAVAILABLE`) by reconfiguring the OTLP exporter to target the cluster-internal `jaeger-collector` service DNS (`jaeger-collector.istio-system.svc.cluster.local`) rather than the local sidecar loopback.
+- **Race Condition Mitigation:** Refined the OpenTelemetry initialization to use the `SimpleSpanProcessor` for synchronous trace dispatch, ensuring 100% trace capture for short-lived batch monitoring tasks (9s runtime).
+- **Sidecar Lifecycle:** Adjusted the CronJob shell wrapper to include an OTel buffer flush period before signaling the Istio proxy termination (`quitquitquit`).
+
+### Security
+- **Image Immutability Compliance:** Enforced strict versioned tagging (v2.3.x) to comply with ECR tag immutability policies, preventing "Latest" tag pollution and enabling reliable rollbacks.
+- **Registry Authentication:** Implemented a standardized 12-hour refresh cycle for ECR `imagePullSecrets` to resolve `ImagePullBackOff` errors in local `kind` clusters.
+
+### Infrastructure
+- **ArgoCD Sync Policy:** Optimized ArgoCD application manifests with `Hard Refresh` triggers to resolve path-lag during directory structure refactoring.
+
 ## [2.3.0] - 2026-04-11
 ### Added
 - **Distributed Tracing:** Integrated OpenTelemetry (OTel) to provide request-level visibility across the monitoring lifecycle.
