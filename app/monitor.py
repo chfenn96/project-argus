@@ -20,8 +20,8 @@ resource = Resource(attributes={
 })
 provider = TracerProvider(resource=resource)
 
-# Using SimpleSpanProcessor to ensure traces leave the pod immediately
-processor = SimpleSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True))
+## Point to the central Jaeger collector in the istio-system namespace
+processor = SimpleSpanProcessor(OTLPSpanExporter(endpoint="http://jaeger-collector.istio-system.svc.cluster.local:4317", insecure=True))
 provider.add_span_processor(processor)
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)

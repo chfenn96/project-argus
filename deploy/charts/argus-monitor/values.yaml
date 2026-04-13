@@ -2,7 +2,7 @@ schedule: "*/5 * * * *"
 
 image:
   repository: 638175140581.dkr.ecr.us-east-1.amazonaws.com/project-argus-monitor
-  tag: "v2.3.3" 
+  tag: "v2.3.4" 
   pullPolicy: IfNotPresent
   pullSecrets:
     - name: regcred
