@@ -8,20 +8,20 @@ from datetime import datetime
 
 # --- OPENTELEMETRY IMPORTS ---
 from opentelemetry import trace
-from opentelemetry.sdk.resources import RESOURCE_ATTRIBUTES, Resource
+from opentelemetry.sdk.resources import Resource  # Removed RESOURCE_ATTRIBUTES
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor # Instant export for testing
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
-# 1. Setup OTel (Only if in K8s/Mesh environment)
-# In Lambda, this would typically point to AWS X-Ray, but here we point to the Istio sidecar.
+# 1. Setup OTel with a simplified Resource definition
 resource = Resource(attributes={
-    RESOURCE_ATTRIBUTES["SERVICE_NAME"]: "project-argus-monitor"
+    "service.name": "project-argus-monitor"
 })
 provider = TracerProvider(resource=resource)
-# Istio sidecar listens for OTLP/gRPC on localhost:4317
-processor = BatchSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True))
+
+# Using SimpleSpanProcessor to ensure traces leave the pod immediately
+processor = SimpleSpanProcessor(OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True))
 provider.add_span_processor(processor)
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
