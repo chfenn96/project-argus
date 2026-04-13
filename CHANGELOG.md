@@ -7,9 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Planned
-- **Phase 11-12 (Platform Engineering):** Istio Service Mesh, and OpenTelemetry Tracing.
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
+
+## [2.3.2] - 2026-04-13
+### Changed
+- **Engine Architecture:** Migrated to a 'Lazy Initialization' pattern for OpenTelemetry to prevent execution leaks and 90s+ hangs in non-Kubernetes environments (CI/CD/Local).
+- **Test Configuration:** Implemented `conftest.py` to manage global environment variables, allowing test files to remain 100% PEP 8 compliant.
+- **Observability:** Replaced standard `print` calls with structured `logging` for system health events while maintaining JSON output for CloudWatch Metric Filters.
+
+### Added
+- **Alerting Verification:** Added `test_run_monitor_failure_triggers_sns` to the test suite to ensure the core business logic (SNS notifications) is gated and verified.
+- **Dependency Guardrails:** Added `IS_TEST_ENV` logic to the monitor engine to automatically detect and disable telemetry export during local development.
+
+### Fixed
+- **Linting Compliance:** Resolved `E402` (import not at top of file) by moving environment setup to the pytest fixture layer.
+- **Test Stability:** Corrected `respx` matching logic by utilizing `url__regex` for more resilient outgoing request interception.
+
+## [2.3.1] - 2026-04-13
+### Fixed
+- **OTel Dependency Resolution:** Resolved a critical `ImportError` caused by a breaking change in the `opentelemetry-sdk` (v1.24+). Migrated from deprecated `RESOURCE_ATTRIBUTES` to standard string-key resource mapping for service identification.
+- **Trace Export Pipeline:** Corrected gRPC transport errors (`StatusCode.UNAVAILABLE`) by reconfiguring the OTLP exporter to target the cluster-internal `jaeger-collector` service DNS (`jaeger-collector.istio-system.svc.cluster.local`) rather than the local sidecar loopback.
+- **Race Condition Mitigation:** Refined the OpenTelemetry initialization to use the `SimpleSpanProcessor` for synchronous trace dispatch, ensuring 100% trace capture for short-lived batch monitoring tasks (9s runtime).
+- **Sidecar Lifecycle:** Adjusted the CronJob shell wrapper to include an OTel buffer flush period before signaling the Istio proxy termination (`quitquitquit`).
+
+### Security
+- **Image Immutability Compliance:** Enforced strict versioned tagging (v2.3.x) to comply with ECR tag immutability policies, preventing "Latest" tag pollution and enabling reliable rollbacks.
+- **Registry Authentication:** Implemented a standardized 12-hour refresh cycle for ECR `imagePullSecrets` to resolve `ImagePullBackOff` errors in local `kind` clusters.
+
+### Infrastructure
+- **ArgoCD Sync Policy:** Optimized ArgoCD application manifests with `Hard Refresh` triggers to resolve path-lag during directory structure refactoring.
+
+## [2.3.0] - 2026-04-11
+### Added
+- **Distributed Tracing:** Integrated OpenTelemetry (OTel) to provide request-level visibility across the monitoring lifecycle.
+- **Trace Spans:** Implemented granular spans for HTTP pings (`ping_<url>`) and DynamoDB operations (`dynamodb_save`) to identify latency bottlenecks.
+- **Jaeger Integration:** Deployed Jaeger within the `istio-system` namespace to aggregate and visualize distributed traces.
+- **Automated Instrumentation:** Leveraged `opentelemetry-instrumentation-httpx` for zero-code header propagation between the engine and the Service Mesh.
+
+### Changed
+- **CronJob Lifecycle:** Modified the shell wrapper in `cronjob.yml` to include a 5-second sleep, ensuring the OTel BatchProcessor flushes all spans before the Istio sidecar terminates.
+- **Dependencies:** Added OTel API, SDK, and OTLP exporters to `app/requirements.txt`.
+
+### Fixed
+- **Trace Loss:** Resolved an issue where traces were dropped during Pod termination by synchronizing the application exit signal with the OTel exporter buffer.
 
 ## [2.2.0] - 2026-04-10
 ### Added

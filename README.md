@@ -40,15 +40,10 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 - [x] **Phases 5-8: Reliability Engineering.** Multi-source Observability (Grafana Cloud), Ansible Linux Automation, Helm Packaging, and SNS/SLO Alerting.
 
 ### ✅ Level 3: Platform Engineering (Current)
-- [x] **Phase 9: GitOps Deployment (ArgoCD).** Transitioned from imperative Helm commands to declarative, self-healing GitOps reconciliation. 
-- [x] **Phase 10: Enterprise Secrets Management (ESO).** Integrated External Secrets Operator with AWS Secrets Manager to eliminate static K8s secrets.
-- [x] **Phase 11: Service Mesh & Zero-Trust (Istio/Linkerd)**
-    - *Objective:* Implement mTLS, circuit breaking, and automated traffic encryption between Argus components.
-- [ ] **Phase 12: Distributed Tracing & APM (OpenTelemetry).** 👈 *Current Phase*
-    - *Objective:* Instrument Python logic to track request latency waterfalls for every site pinged.
+- [x] **Phases 9-12: Modern Infrastructure Operations.** GitOps (ArgoCD), Cloud-Synced Secrets (ESO), Zero-Trust mTLS (Istio), and Distributed Tracing (OpenTelemetry). 
 
 ### 🚀 Level 4: Advanced Resilience & Scaling
-- [ ] **Phase 13: Chaos Engineering (Litmus/Chaos Mesh).**
+- [ ] **Phase 13: Chaos Engineering (Litmus/Chaos Mesh).** 👈 *Current Phase*
     - *Objective:* Intentionally "kill" AWS regions or K8s nodes to verify Argus fails over gracefully.
 - [ ] **Phase 14: Multi-Region High Availability.**
     - *Objective:* Deploy Argus across us-east-1 and eu-west-1 with Global DynamoDB Tables.
