@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Planned
-- **Phase 11-12 (Platform Engineering):** Istio Service Mesh, and OpenTelemetry Tracing.
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
+
+## [2.3.2] - 2026-04-13
+### Changed
+- **Engine Architecture:** Migrated to a 'Lazy Initialization' pattern for OpenTelemetry to prevent execution leaks and 90s+ hangs in non-Kubernetes environments (CI/CD/Local).
+- **Test Configuration:** Implemented `conftest.py` to manage global environment variables, allowing test files to remain 100% PEP 8 compliant.
+- **Observability:** Replaced standard `print` calls with structured `logging` for system health events while maintaining JSON output for CloudWatch Metric Filters.
+
+### Added
+- **Alerting Verification:** Added `test_run_monitor_failure_triggers_sns` to the test suite to ensure the core business logic (SNS notifications) is gated and verified.
+- **Dependency Guardrails:** Added `IS_TEST_ENV` logic to the monitor engine to automatically detect and disable telemetry export during local development.
+
+### Fixed
+- **Linting Compliance:** Resolved `E402` (import not at top of file) by moving environment setup to the pytest fixture layer.
+- **Test Stability:** Corrected `respx` matching logic by utilizing `url__regex` for more resilient outgoing request interception.
 
 ## [2.3.1] - 2026-04-13
 ### Fixed

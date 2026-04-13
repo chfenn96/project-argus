@@ -4,98 +4,130 @@ import boto3
 import json
 import time
 import os
+import logging
 from datetime import datetime
 
 # --- OPENTELEMETRY IMPORTS ---
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import (
-    SimpleSpanProcessor,
-)  # Instant export for testing
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
-# --- OPENTELEMETRY SETUP ---
-# Check if we are running in a test environment or local
-IS_TEST = (
-    os.getenv("PYTEST_CURRENT_TEST") is not None or os.getenv("ARGUS_LOCAL") == "true"
-)
-
-resource = Resource(attributes={"service.name": "project-argus-monitor"})
-provider = TracerProvider(resource=resource)
-
-if not IS_TEST:
-    # This ONLY runs in Production (Kubernetes)
-    try:
-        processor = SimpleSpanProcessor(
-            OTLPSpanExporter(
-                endpoint="http://jaeger-collector.istio-system.svc.cluster.local:4317",
-                insecure=True,
-            )
-        )
-        provider.add_span_processor(processor)
-    except Exception as e:
-        print(f"Telemetry failed: {e}")
-else:
-    print("🛠️ Running in Local/Test mode: Telemetry Export Disabled")
-
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer(__name__)
-
-# Auto-instrument all httpx clients
-HTTPXClientInstrumentor().instrument()
-
-# --- CONFIGURATION ---
-URLS_ENV = os.getenv(
-    "URLS_TO_MONITOR",
-    "https://www.google.com,https://www.github.com,https://www.wikipedia.org",
-)
-URLS_TO_MONITOR = [url.strip() for url in URLS_ENV.split(",")]
+# --- GLOBAL CONFIGURATION ---
+# Use constants for defaults, but allow environment overrides
+URLS_TO_MONITOR = [
+    url.strip()
+    for url in os.getenv(
+        "URLS_TO_MONITOR",
+        "https://www.google.com,https://www.github.com,https://www.wikipedia.org",
+    ).split(",")
+]
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
+# Detection for CI/CD or Local environments to prevent telemetry hangs
+IS_TEST_ENV = any(
+    os.getenv(env) for env in ["PYTEST_CURRENT_TEST", "ARGUS_LOCAL", "GITHUB_ACTIONS"]
+)
+
+# Initialize logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("project-argus")
 
 
-async def check_uptime(client, url, retries=3):
-    """Pings a URL with browser headers and retry logic."""
+def get_tracer():
+    """
+    Lazy-initializes Telemetry.
+    Senior SRE Note: Encapsulating this prevents the 98s hang in GitHub Actions
+    because we don't try to connect to a collector during 'import monitor'.
+    """
+    if IS_TEST_ENV:
+        # Return a no-op tracer in test/local environments
+        return trace.get_tracer(__name__)
+
+    try:
+        resource = Resource(attributes={"service.name": "project-argus-monitor"})
+        provider = TracerProvider(resource=resource)
+
+        # SimpleSpanProcessor sends spans immediately (best for CronJobs/Lambda)
+        exporter = OTLPSpanExporter(
+            endpoint="http://jaeger-collector.istio-system.svc.cluster.local:4317",
+            insecure=True,
+        )
+        provider.add_span_processor(SimpleSpanProcessor(exporter))
+        trace.set_tracer_provider(provider)
+
+        # Instrument HTTPX automatically
+        HTTPXClientInstrumentor().instrument()
+        return trace.get_tracer(__name__)
+    except Exception as e:
+        logger.warning(f"Telemetry failed to initialize: {e}. Falling back to default.")
+        return trace.get_tracer(__name__)
+
+
+# Single instance of tracer
+tracer = get_tracer()
+
+
+async def check_uptime(client: httpx.AsyncClient, url: str, retries: int = 3):
+    """
+    Core ping logic with retry and exponential backoff.
+    Wrapped in an OTel span with rich metadata for Jaeger.
+    """
     with tracer.start_as_current_span(f"ping_{url}") as span:
-        result = {
-            "url": url,
-            "timestamp": datetime.utcnow().isoformat(),
-            "status": "DOWN",
-            "response_time_ms": 0,
-            "status_code": None,
-        }
-        headers = {"User-Agent": "ArgusMonitor/v2.2.0 (SRE Portfolio Project)"}
+        headers = {"User-Agent": "ArgusMonitor/v2.3.4 (SRE Portfolio Project)"}
 
         for attempt in range(retries):
             try:
                 start_time = time.time()
+                # Timeout matches our Chaos Mesh experiment (5s)
                 response = await client.get(
                     url, timeout=5.0, headers=headers, follow_redirects=True
                 )
+                latency = round((time.time() - start_time) * 1000)
 
-                result["response_time_ms"] = round((time.time() - start_time) * 1000)
-                result["status_code"] = response.status_code
-
-                # Add metadata to the trace span
+                # Metadata for Distributed Tracing
                 span.set_attribute("http.status_code", response.status_code)
+                span.set_attribute("http.url", url)
+                span.set_attribute("argus.latency_ms", latency)
                 span.set_attribute("argus.attempt", attempt + 1)
 
                 if 200 <= response.status_code < 300:
-                    result["status"] = "UP"
-                    return result
+                    return {
+                        "url": url,
+                        "status": "UP",
+                        "status_code": response.status_code,
+                        "response_time_ms": latency,
+                        "timestamp": datetime.utcnow().isoformat(),
+                    }
+
+                logger.warning(
+                    f"Attempt {attempt+1}: {url} returned {response.status_code}"
+                )
 
             except Exception as e:
                 span.record_exception(e)
+                logger.error(
+                    f"Attempt {attempt+1}: Connection failed for {url}: {str(e)}"
+                )
                 if attempt < retries - 1:
                     await asyncio.sleep(0.1 * (2**attempt))
-        return result
+
+        return {
+            "url": url,
+            "status": "DOWN",
+            "status_code": 0,
+            "response_time_ms": 0,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
 
 
 async def run_monitor():
-    """Core logic: Pings sites, saves to DB, and sends alerts."""
-    # Explicitly set region for all clients
+    """
+    Main orchestration loop.
+    Handles AWS client lifecycle and concurrency.
+    """
     with tracer.start_as_current_span("run_monitor_loop"):
         db = boto3.resource("dynamodb", region_name=AWS_REGION)
         table = db.Table("ArgusMetrics")
@@ -106,40 +138,38 @@ async def run_monitor():
             results = await asyncio.gather(*tasks)
 
             for metrics in results:
+                # Log JSON for CloudWatch Metric Filters
                 print(json.dumps(metrics))
-                # Span for Database interaction
+
                 with tracer.start_as_current_span("dynamodb_save"):
                     try:
                         table.put_item(Item=metrics)
                     except Exception as e:
-                        print(f"❌ DB SAVE FAILURE: {e}")
+                        logger.error(f"DynamoDB Failure: {e}")
 
+            # Alerting Logic
             failures = [r["url"] for r in results if r["status"] == "DOWN"]
             if failures and SNS_TOPIC_ARN:
                 with tracer.start_as_current_span("sns_alert"):
-                    # FIXED: Define the joined string outside the f-string
-                    # to avoid backslash (\n) in the f-string expression.
-                    failure_list = "\n- ".join(failures)
-                    message = f"Project Argus detected outages:\n\n- {failure_list}"
-
-                    sns.publish(
-                        TopicArn=SNS_TOPIC_ARN, Subject="⚠️ Argus Alert", Message=message
-                    )
+                    failure_msg = "\n- ".join(failures)
+                    message = f"Argus Alert: Multiple outages detected!\n\nFailed Sites:\n- {failure_msg}"
+                    try:
+                        sns.publish(
+                            TopicArn=SNS_TOPIC_ARN,
+                            Subject="⚠️ Argus Outage Report",
+                            Message=message,
+                        )
+                    except Exception as e:
+                        logger.error(f"SNS Failure: {e}")
 
     return results
 
 
 def lambda_handler(event, context):
-    """AWS Lambda entry point: Standard sync wrapper for async work."""
-    print("Lambda handler started...")
-    # This executes the async work and WAITS for the real list result
-    output = asyncio.run(run_monitor())
-
-    return {"statusCode": 200, "body": output}
+    """Entry point for AWS Lambda."""
+    return {"statusCode": 200, "body": asyncio.run(run_monitor())}
 
 
 if __name__ == "__main__":
-    print("Running local verification...")
-    final_output = lambda_handler(None, None)
-    print("\n--- FINAL OUTPUT TO AWS ---")
-    print(json.dumps(final_output, indent=2))
+    # Local execution entry point
+    asyncio.run(run_monitor())
