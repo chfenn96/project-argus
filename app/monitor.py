@@ -8,21 +8,38 @@ from datetime import datetime
 
 # --- OPENTELEMETRY IMPORTS ---
 from opentelemetry import trace
-from opentelemetry.sdk.resources import Resource  # Removed RESOURCE_ATTRIBUTES
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor # Instant export for testing
+from opentelemetry.sdk.trace.export import (
+    SimpleSpanProcessor,
+)  # Instant export for testing
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
-# 1. Setup OTel with a simplified Resource definition
-resource = Resource(attributes={
-    "service.name": "project-argus-monitor"
-})
+# --- OPENTELEMETRY SETUP ---
+# Check if we are running in a test environment or local
+IS_TEST = (
+    os.getenv("PYTEST_CURRENT_TEST") is not None or os.getenv("ARGUS_LOCAL") == "true"
+)
+
+resource = Resource(attributes={"service.name": "project-argus-monitor"})
 provider = TracerProvider(resource=resource)
 
-## Point to the central Jaeger collector in the istio-system namespace
-processor = SimpleSpanProcessor(OTLPSpanExporter(endpoint="http://jaeger-collector.istio-system.svc.cluster.local:4317", insecure=True))
-provider.add_span_processor(processor)
+if not IS_TEST:
+    # This ONLY runs in Production (Kubernetes)
+    try:
+        processor = SimpleSpanProcessor(
+            OTLPSpanExporter(
+                endpoint="http://jaeger-collector.istio-system.svc.cluster.local:4317",
+                insecure=True,
+            )
+        )
+        provider.add_span_processor(processor)
+    except Exception as e:
+        print(f"Telemetry failed: {e}")
+else:
+    print("🛠️ Running in Local/Test mode: Telemetry Export Disabled")
+
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
@@ -30,7 +47,10 @@ tracer = trace.get_tracer(__name__)
 HTTPXClientInstrumentor().instrument()
 
 # --- CONFIGURATION ---
-URLS_ENV = os.getenv("URLS_TO_MONITOR", "https://www.google.com,https://www.github.com,https://www.wikipedia.org")
+URLS_ENV = os.getenv(
+    "URLS_TO_MONITOR",
+    "https://www.google.com,https://www.github.com,https://www.wikipedia.org",
+)
 URLS_TO_MONITOR = [url.strip() for url in URLS_ENV.split(",")]
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
@@ -51,11 +71,13 @@ async def check_uptime(client, url, retries=3):
         for attempt in range(retries):
             try:
                 start_time = time.time()
-                response = await client.get(url, timeout=5.0, headers=headers, follow_redirects=True)
-                
+                response = await client.get(
+                    url, timeout=5.0, headers=headers, follow_redirects=True
+                )
+
                 result["response_time_ms"] = round((time.time() - start_time) * 1000)
                 result["status_code"] = response.status_code
-                
+
                 # Add metadata to the trace span
                 span.set_attribute("http.status_code", response.status_code)
                 span.set_attribute("argus.attempt", attempt + 1)
@@ -95,8 +117,14 @@ async def run_monitor():
             failures = [r["url"] for r in results if r["status"] == "DOWN"]
             if failures and SNS_TOPIC_ARN:
                 with tracer.start_as_current_span("sns_alert"):
-                    message = f"Project Argus detected outages:\n\n- " + "\n- ".join(failures)
-                    sns.publish(TopicArn=SNS_TOPIC_ARN, Subject="⚠️ Argus Alert", Message=message)
+                    # FIXED: Define the joined string outside the f-string
+                    # to avoid backslash (\n) in the f-string expression.
+                    failure_list = "\n- ".join(failures)
+                    message = f"Project Argus detected outages:\n\n- {failure_list}"
+
+                    sns.publish(
+                        TopicArn=SNS_TOPIC_ARN, Subject="⚠️ Argus Alert", Message=message
+                    )
 
     return results
 
