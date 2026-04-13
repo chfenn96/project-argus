@@ -39,10 +39,10 @@ This project was designed to demonstrate modern cloud infrastructure, infrastruc
 ### ✅ Level 2: Infrastructure & Orchestration
 - [x] **Phases 5-8: Reliability Engineering.** Multi-source Observability (Grafana Cloud), Ansible Linux Automation, Helm Packaging, and SNS/SLO Alerting.
 
-### ✅ Level 3: Platform Engineering (Current)
+### ✅ Level 3: Platform Engineering
 - [x] **Phases 9-12: Modern Infrastructure Operations.** GitOps (ArgoCD), Cloud-Synced Secrets (ESO), Zero-Trust mTLS (Istio), and Distributed Tracing (OpenTelemetry). 
 
-### 🚀 Level 4: Advanced Resilience & Scaling
+### 🚀 Level 4: Advanced Resilience & Scaling (Current)
 - [ ] **Phase 13: Chaos Engineering (Litmus/Chaos Mesh).** 👈 *Current Phase*
     - *Objective:* Intentionally "kill" AWS regions or K8s nodes to verify Argus fails over gracefully.
 - [ ] **Phase 14: Multi-Region High Availability.**
