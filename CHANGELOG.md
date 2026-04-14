@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 13-15 (SRE & Resilience):** Multi-region Active-Active architecture, Chaos Engineering (Chaos Mesh), and ChatOps.
 - **Phase 16-20 (Masterclass):** Infracost (FinOps), Falco Runtime Security, Policy as Code (Kyverno), Event-Driven Scaling (KEDA), and LLM-powered AIOps.
 
+## [2.4.0] - 2026-04-14
+### Added
+- **Chaos Engineering:** Integrated Chaos Mesh as a core reliability testing tool.
+- **Fault Injection:** Implemented `PodChaos` manifests to simulate random node/pod failures.
+- **Resilience Verification:** Successfully proved the system's ability to self-heal via the Kubernetes Job Controller, ensuring 100% monitoring uptime during infrastructure instability.
+
+### Fixed
+- **Experiment Scope:** Resolved case-sensitivity issues in Chaos Mesh selectors and reconciled controller-daemon communication gaps in the local WSL/Kind environment.
+
 ## [2.3.2] - 2026-04-13
 ### Changed
 - **Engine Architecture:** Migrated to a 'Lazy Initialization' pattern for OpenTelemetry to prevent execution leaks and 90s+ hangs in non-Kubernetes environments (CI/CD/Local).

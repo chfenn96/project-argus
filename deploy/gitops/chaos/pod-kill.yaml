@@ -1,0 +1,15 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Schedule
+metadata:
+  name: monitor-assassin
+  namespace: default
+spec:
+  schedule: '@every 10s'
+  type: 'PodChaos'
+  historyLimit: 2
+  podChaos:
+    action: pod-kill
+    mode: one
+    selector:
+      labelSelectors:
+        app: project-argus-monitor

@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: monitor-latency
+  namespace: default
+spec:
+  action: delay
+  mode: one        # Target the monitor pod
+  selector:
+    labelSelectors:
+      app: project-argus-monitor
+  delay:
+    latency: "5000ms" # Inject 5 seconds of network lag
+    correlation: "100"
+    jitter: "0ms"
+  direction: to       # Apply lag to outgoing traffic
+  duration: "10m"     # Experiment stays active for 10 minutes

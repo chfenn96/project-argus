@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: chaos-kill-experiment
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: project-argus-monitor # Matches the Chaos Mesh selector
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: monitor
+        image: 638175140581.dkr.ecr.us-east-1.amazonaws.com/project-argus-monitor:v2.3.4
+        command: ["/bin/sh", "-c"]
+        args: 
+          - |
+            python monitor.py; 
+            echo "Pings finished, waiting to be killed..."; 
+            sleep 30; 
+            curl -sf -X POST http://localhost:15020/quitquitquit;
+        envFrom:
+        - secretRef:
+            name: aws-creds
+      restartPolicy: OnFailure # CRITICAL: This tells K8s to try again if the pod dies

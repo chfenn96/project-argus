@@ -1,0 +1,12 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: monitor-assassin-direct
+  namespace: default
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    labelSelectors:
+      # Use lowercase 'app' to match your actual pods
+      app: project-argus-monitor
